@@ -47,6 +47,6 @@ So you should enter the directory, and then init the sbmodule and update it.
 
 
 
-# License
+# Licence
 
 This software as the Python Twitter Tools are released under an MIT License.
