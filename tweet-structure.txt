@@ -1,0 +1,49 @@
+Tweet
+    id long
+    in_reply_to_status_id long
+    in_reply_to_user_id long
+    favorited boolean
+    retweeted boolean
+    retweet_count int
+
+    lang char2
+    text text
+
+    created_at date
+
+    user Object
+    entities Object
+
+    geo ?
+    coordinates ?
+    place ?
+
+User
+    id long
+    screen_name text
+    name text
+
+    verified boolean
+    protected boolean
+
+    followers_count bigint
+    friends_count bigint
+
+    statuses_count bigint
+    favourites_count int
+
+    location text
+    utc_offset int
+    time_zone
+    geo_enabled boolean
+
+    lang char2
+    description text
+
+    url
+    created_at date
+
+
+
+
+
