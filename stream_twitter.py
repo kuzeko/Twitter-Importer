@@ -29,7 +29,7 @@ count = 0
 for tweet in iterator:
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
         print tweet['text']
-        if (tweet['entities']['urls']) > 0  :
+        if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
             print tweet['urls']
     	count = count + 1
 print "-------"
