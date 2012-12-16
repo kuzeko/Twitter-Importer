@@ -32,6 +32,19 @@ This process should save these for later so that the user doesn't have to do the
 Keep them secret!
 
 
+Python Twitter Tools as Submodule
+--------------
+
+[Sixohsix's Python Twitter Tools](https://github.com/sixohsix/twitter) are included as a submodule.
+You can read more about [Submodules Git Tool](http://git-scm.com/book/en/Git-Tools-Submodules), basically when you receive the project, you get the directories that contain the submodule, but none of the files yet:
+
+So you should enter the directory, and then init the sbmodule and update it.
+
+    cd lib/twitter-python
+    git submodule init
+    git submodule update
+
+
 
 
 License
