@@ -85,7 +85,15 @@ for tweet in iterator:
         datetime = time.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y')
         ts = time.strftime('%Y-%m-%d %H:%M:%S', datetime)
         print datetime
-        print ts;
+        print ts
+
+        for field in tweet_fields_list :
+            if field not in tweet :
+                print field
+                print '++'
+                print tweet.keys()
+
+        break
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
             for url in tweet['entities']['urls'] :
                 print url
