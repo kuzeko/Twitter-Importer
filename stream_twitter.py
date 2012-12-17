@@ -35,7 +35,7 @@ conn = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME)
 cursor = conn.cursor()
 logger.info( "...done!")
 
-tweet_fields_list = ['id', 'user_id', 'in_reply_to_status_id', 'in_reply_to_user_id', 'favorited', 'retweeted', 'retwet_count', 'lang', 'created_at']
+tweet_fields_list = ['id', 'user_id', 'in_reply_to_status_id', 'in_reply_to_user_id', 'favorited', 'retweeted', 'retweet_count', 'lang', 'created_at']
 tweet_fields = ', '.join(tweet_fields_list)
 tweet_placeholders = ', '.join(['%s']*len(tweet_fields_list))
 insert_tweets_sql = 'INSERT INTO tweet (' + tweet_fields + ') VALUES (' +  tweet_placeholders  + ')'
@@ -90,6 +90,8 @@ for tweet in iterator:
         print datetime
 
         for field in tweet_fields_list :
+            if field == 'user_id' :
+                print tweet['user'][field]
             if field not in tweet :
                 print field
                 print '++'
