@@ -33,14 +33,37 @@ conn = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME)
 cursor = conn.cursor()
 logger.info( "...done!")
 
-insert_tweets_sql = """INSERT INTO tweet (id, user_id, in_reply_to_status_id, in_reply_to_user_id, favorited, retweeted, retwet_count, lang, created_at)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+tweet_fields_list = ['id', 'user_id', 'in_reply_to_status_id', 'in_reply_to_user_id', 'favorited', 'retweeted', 'retwet_count', 'lang', 'created_at']
+tweet_fields = ', '.join(tweet_fields_list)
+tweet_placeholders = ', '.join(['%s']*len(tweet_fields_list))
+insert_tweets_sql = 'INSERT INTO tweet (' + tweet_fields + ') VALUES (' +  tweet_placeholders  + ')'
 
-insert_tweets_texts_sql = """INSERT INTO tweet_text (tweet_id, user_id, text, lat, long, place_full_name, place_id)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+tweet_text_fields_list = ['tweet_id', 'user_id', 'text', 'lat', 'long', 'place_full_name', 'place_id']
+tweet_text_fields = ', '.join(tweet_text_fields_list)
+tweet_text_placeholders = ', '.join(['%s']*len(tweet_text_fields_list))
+insert_tweets_texts_sql = 'INSERT INTO tweet_text (' + tweet_text_fields + ') VALUES (' + tweet_text_placeholders + ')'
 
-insert_tweets_urls_sql = """INSERT INTO tweet_url (tweet_id, user_id, text, lat, long, place_full_name, place_id)
-                       VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+
+tweet_url_fields_list = ['tweet_id, 'progressive', 'url']
+tweet_url_fields = ', '.join(tweet_url_fields_list)
+tweet_url_placeholders = ', '.join(['%s']*len(tweet_url_fields_list))
+insert_tweets_urls_sql = 'INSERT INTO tweet_url (' + tweet_url_fields + ') VALUES ( ' + tweet_url_placeholders + ')'
+
+tweet_hashtag_fields_list = ['tweet_id', 'user_id', 'hashtag_id']
+tweet_hashtag_fields = ', '.join(tweet_hashtag_fields_list)
+tweet_hashtag_placeholders = ', '.join(['%s']*len(tweet_hashtag_fields_list))
+insert_tweets_hashtags_sql = 'INSERT INTO tweet_hashtag (' + tweet_hashtag_fields + ') VALUES (' + tweet_hashtag_placeholders + ')'
+
+
+insert_hashtags_sql = 'INSERT INTO tweet_hashtag (hashtag) VALUES (%s)'
+
+user_fields_list = ['id', 'screen_name', 'name', 'verified', 'protected', 'followers_count', 'friends_count', 'statuses_count', 'favourites_count', 'location', 'utc_offset', 'time_zone', 'geo_enabled', 'lang', 'description', 'url', 'created_at']
+user_fields = ', '.join(user_fields_list)
+user_placeholders = ', '.join(['%s']*len(user_fields_list))
+
+insert_users_sql = 'INSERT INTO tweet (' + user_fields + ') VALUES (' + user_placeholders + ')'
+
+
 
 
 
@@ -50,14 +73,24 @@ iterator = twitter_stream.statuses.sample()
 
 # Use the stream
 
+tweets = []
+tweet_texts = []
+urls = {}
+hashtags = {}
+users = {}
+
 count = 0
 for tweet in iterator:
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
-        print tweet['text']
+        datetime = time.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y')
+        ts = time.strftime('%Y-%m-%d %H:%M:%S', datetime)
+        print datetime
+        print ts;
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
             for url in tweet['entities']['urls'] :
                 print url
     	count = count + 1
+        print count
 print "-------"
 print count
 
