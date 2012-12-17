@@ -44,7 +44,7 @@ tweet_text_placeholders = ', '.join(['%s']*len(tweet_text_fields_list))
 insert_tweets_texts_sql = 'INSERT INTO tweet_text (' + tweet_text_fields + ') VALUES (' + tweet_text_placeholders + ')'
 
 
-tweet_url_fields_list = ['tweet_id, 'progressive', 'url']
+tweet_url_fields_list = ['tweet_id', 'progressive', 'url']
 tweet_url_fields = ', '.join(tweet_url_fields_list)
 tweet_url_placeholders = ', '.join(['%s']*len(tweet_url_fields_list))
 insert_tweets_urls_sql = 'INSERT INTO tweet_url (' + tweet_url_fields + ') VALUES ( ' + tweet_url_placeholders + ')'
