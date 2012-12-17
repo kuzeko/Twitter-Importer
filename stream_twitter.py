@@ -77,32 +77,48 @@ iterator = twitter_stream.statuses.sample()
 timer = datetime.datetime.now()
 
 tweets = []
+tweet_record = []
 tweet_texts = []
 urls = {}
 hashtags = {}
 users = {}
 
+
 count = 0
 for tweet in iterator:
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
-        datetime = parser.parse(tweet['created_at'])
-        datetime = datetime.isoformat(' ')[:-6]
-        print datetime
-
+        count = count + 1
+        
         for field in tweet_fields_list :
             if field == 'user_id' :
-                print tweet['user'][field]
-            if field not in tweet :
+                tweet_record.apped(tweet['user']['id'])
+            if field == 'created_at' :
+                datetime = parser.parse(tweet['created_at'])
+                datetime = datetime.isoformat(' ')[:-6]
+                tweet_record.apped(datetime)
+            elif field in tweet :                                
+                tweet_record.apped(tweet[field])
+            else:
                 print field
                 print '++'
+                print tweet
+                print '++'
                 print tweet.keys()
+                break
 
-        break
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
             for url in tweet['entities']['urls'] :
                 print url
-    	count = count + 1
-        print count
+            for hash in tweet['entities']['hashtags'] :
+                print hash
+
+        if count > 5 :
+            break
+    else :
+        print "What's this!?"
+        print tweet
+        break
+             
 print "-------"
 print count
 
