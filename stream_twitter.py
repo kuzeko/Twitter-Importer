@@ -2,6 +2,8 @@ import gc
 import os
 import sys
 import logging
+import datetime
+import dateutil.parser as parser
 import ConfigParser
 import MySQLdb
 
@@ -72,6 +74,7 @@ twitter_stream = TwitterStream(auth=oauth)
 iterator = twitter_stream.statuses.sample()
 
 # Use the stream
+timer = datetime.datetime.now()
 
 tweets = []
 tweet_texts = []
@@ -82,10 +85,9 @@ users = {}
 count = 0
 for tweet in iterator:
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
-        datetime = time.strptime(tweet['created_at'],'%a %b %d %H:%M:%S +0000 %Y')
-        ts = time.strftime('%Y-%m-%d %H:%M:%S', datetime)
+        datetime = parser.parse(tweet['created_at'])
+        datetime = datetime.isoformat()
         print datetime
-        print ts
 
         for field in tweet_fields_list :
             if field not in tweet :
