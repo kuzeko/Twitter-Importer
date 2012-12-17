@@ -21,7 +21,7 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`tweet` (
   `retweet_count` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `lang` CHAR(2) NOT NULL DEFAULT '--' ,
   `created_at` DATETIME NOT NULL ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`id`, `user_id`) )
 ENGINE = InnoDB;
 
 CREATE INDEX `USER_ID` USING BTREE ON `twitter`.`tweet` (`user_id` ASC) ;
@@ -35,14 +35,14 @@ CREATE INDEX `DATE` ON `twitter`.`tweet` (`created_at` ASC) ;
 DROP TABLE IF EXISTS `twitter`.`tweet_text` ;
 
 CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_text` (
-  `id` BIGINT UNSIGNED NOT NULL ,
+  `tweet_id` BIGINT UNSIGNED NOT NULL ,
   `user_id` BIGINT UNSIGNED NOT NULL ,
   `text` VARCHAR(160) NOT NULL DEFAULT '' ,
   `lat` DECIMAL(18,12) NULL ,
   `long` DECIMAL(18,12) NULL ,
   `place_full_name` VARCHAR(160) NULL ,
   `place_id` VARCHAR(160) NULL ,
-  PRIMARY KEY (`id`) )
+  PRIMARY KEY (`tweet_id`, `user_id`) )
 ENGINE = InnoDB;
 
 
@@ -108,8 +108,10 @@ DROP TABLE IF EXISTS `twitter`.`tweet_url` ;
 
 CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_url` (
   `tweet_id` BIGINT UNSIGNED NOT NULL ,
+  `user_id` BIGINT UNSIGNED NOT NULL ,
+  `progressive` SMALLINT UNSIGNED NOT NULL ,
   `url` TEXT NULL ,
-  PRIMARY KEY (`tweet_id`) )
+  PRIMARY KEY (`tweet_id`, `user_id`, `progressive`) )
 ENGINE = InnoDB;
 
 
