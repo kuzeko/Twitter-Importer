@@ -21,8 +21,8 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`tweet` (
   `retweet_count` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `lang` CHAR(2) NOT NULL DEFAULT '--' ,
   `created_at` DATETIME NOT NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB;
+  PRIMARY KEY (`id`, `user_id`) )
+ENGINE = MyISAM;
 
 CREATE INDEX `USER_ID` USING BTREE ON `twitter`.`tweet` (`user_id` ASC) ;
 
@@ -42,8 +42,8 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_text` (
   `long` DECIMAL(18,12) NULL ,
   `place_full_name` VARCHAR(160) NULL ,
   `place_id` VARCHAR(160) NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = InnoDB;
+  PRIMARY KEY (`id`, `user_id`) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -70,7 +70,7 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`user` (
   `url` VARCHAR(160) NULL ,
   `created_at` DATETIME NULL ,
   PRIMARY KEY (`id`) )
-ENGINE = InnoDB;
+ENGINE = MyISAM;
 
 CREATE INDEX `LANG` ON `twitter`.`user` (`lang` ASC) ;
 
@@ -82,9 +82,10 @@ DROP TABLE IF EXISTS `twitter`.`tweet_hashtag` ;
 
 CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_hashtag` (
   `tweet_id` BIGINT UNSIGNED NOT NULL ,
+  `user_id` BIGINT UNSIGNED NOT NULL ,
   `hashtag_id` BIGINT UNSIGNED NOT NULL ,
-  PRIMARY KEY (`tweet_id`, `hashtag_id`) )
-ENGINE = InnoDB;
+  PRIMARY KEY (`tweet_id`, `hashtag_id`, `user_id`) )
+ENGINE = MyISAM;
 
 
 -- -----------------------------------------------------
@@ -96,7 +97,7 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`hashtag` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `hashtag` VARCHAR(160) NOT NULL ,
   PRIMARY KEY (`id`) )
-ENGINE = InnoDB;
+ENGINE = MyISAM;
 
 CREATE UNIQUE INDEX `hashtag_UNIQUE` ON `twitter`.`hashtag` (`hashtag` ASC) ;
 
@@ -108,9 +109,10 @@ DROP TABLE IF EXISTS `twitter`.`tweet_url` ;
 
 CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_url` (
   `tweet_id` BIGINT UNSIGNED NOT NULL ,
+  `progressive` SMALLINT UNSIGNED NOT NULL ,
   `url` TEXT NULL ,
-  PRIMARY KEY (`tweet_id`) )
-ENGINE = InnoDB;
+  PRIMARY KEY (`tweet_id`, `progressive`) )
+ENGINE = MyISAM;
 
 
 
