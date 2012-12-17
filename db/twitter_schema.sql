@@ -35,14 +35,14 @@ CREATE INDEX `DATE` ON `twitter`.`tweet` (`created_at` ASC) ;
 DROP TABLE IF EXISTS `twitter`.`tweet_text` ;
 
 CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_text` (
-  `id` BIGINT UNSIGNED NOT NULL ,
+  `tweet_id` BIGINT UNSIGNED NOT NULL ,
   `user_id` BIGINT UNSIGNED NOT NULL ,
   `text` VARCHAR(160) NOT NULL DEFAULT '' ,
   `lat` DECIMAL(18,12) NULL ,
   `long` DECIMAL(18,12) NULL ,
   `place_full_name` VARCHAR(160) NULL ,
   `place_id` VARCHAR(160) NULL ,
-  PRIMARY KEY (`id`, `user_id`) )
+  PRIMARY KEY (`tweet_id`, `user_id`) )
 ENGINE = MyISAM;
 
 
