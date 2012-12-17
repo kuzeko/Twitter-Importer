@@ -86,7 +86,7 @@ count = 0
 for tweet in iterator:
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
         datetime = parser.parse(tweet['created_at'])
-        datetime = datetime.isoformat()
+        datetime = datetime.isoformat(' ')[:-6]
         print datetime
 
         for field in tweet_fields_list :
