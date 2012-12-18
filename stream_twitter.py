@@ -92,7 +92,7 @@ for tweet in iterator:
         for field in tweet_fields_list :
             if field == 'user_id' :
                 tweet_record.append(tweet['user']['id'])
-            if field == 'created_at' :
+            elif field == 'created_at' :
                 datetime = parser.parse(tweet['created_at'])
                 datetime = datetime.isoformat(' ')[:-6]
                 tweet_record.append(datetime)
