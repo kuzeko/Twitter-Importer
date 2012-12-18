@@ -156,8 +156,9 @@ for tweet in iterator:
             try:
                 cursor.executemany(insert_tweets_sql, tweets)
                 cursor.executemany(insert_tweets_texts_sql, tweet_texts)
-            except Exception :
+            except Exception as e:
                 print  cursor._last_executed
+                print "An error occurred while exectuing the query\n error({0}): {1}".format(e.errno, e.strerror)            
             break
     #else :
     #    print "What's this!?"
