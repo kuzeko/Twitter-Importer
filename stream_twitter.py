@@ -88,7 +88,7 @@ users               = {}
 count = 0
 for tweet in iterator:
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
-        count = count + 1
+        
         tweet_record = []
         tweet_text_record   = []
         
@@ -108,12 +108,12 @@ for tweet in iterator:
             elif field == 'user_id' :
                 tweet_text_record.append(tweet['user']['id'])
             elif field == 'lat' :
-                if tweet['geo'] != None :
+                if tweet['geo'] != None and len(tweet['geo']) >0:
                     tweet_text_record.append(tweet['geo'][0])
                 else :
                     tweet_text_record.append(0)
             elif field == 'long' :
-                if tweet['geo'] != None :
+                if tweet['geo'] != None and len(tweet['geo']) >0 :
                     tweet_text_record.append(tweet['geo'][1])
                 else :
                     tweet_text_record.append(0)
@@ -142,6 +142,7 @@ for tweet in iterator:
                 break
 
         if tweet['place'] != None :
+            count = count + 1
             print tweet['place']
         if tweet['geo'] != None and len(tweet['geo']) >0 :
             print tweet['geo']
