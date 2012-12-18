@@ -31,7 +31,7 @@ oauth = OAuth( oauth_token, oauth_secret,CONSUMER_KEY,  CONSUMER_SECRET)
 
 
 logger.info( "Trying to connect to" + DB_HOST +"...")
-conn = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME)
+conn = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME, charset='utf8' )
 cursor = conn.cursor()
 logger.info( "...done!")
 
@@ -45,7 +45,7 @@ tweet_text_fields = ', '.join(tweet_text_fields_list)
 tweet_text_placeholders = ', '.join(['%s']*len(tweet_text_fields_list))
 insert_tweets_texts_sql = 'INSERT INTO tweet_text (' + tweet_text_fields + ') VALUES (' + tweet_text_placeholders + ')'
 
-tweet_url_fields_list = ['tweet_id', 'progressive', 'url']
+tweet_url_fields_list = ['tweet_id', 'user_id', 'progressive', 'url']
 tweet_url_fields = ', '.join(tweet_url_fields_list)
 tweet_url_placeholders = ', '.join(['%s']*len(tweet_url_fields_list))
 insert_tweets_urls_sql = 'INSERT INTO tweet_url (' + tweet_url_fields + ') VALUES ( ' + tweet_url_placeholders + ') ON DUPLICATE KEY UPDATE tweet_id=VALUES(tweet_id)'
@@ -91,9 +91,12 @@ for tweet in iterator:
         tweet_record = []
         tweet_text_record   = []
         
+        user_data = tweet['user']
+        user_id = user_data[id]
+        
         for field in tweet_fields_list :
             if field == 'user_id' :
-                tweet_record.append(tweet['user']['id'])
+                tweet_record.append(user_id)
             elif field == 'created_at' :
                 datetime = parser.parse(tweet['created_at'])
                 datetime = datetime.isoformat(' ')[:-6]
@@ -110,7 +113,7 @@ for tweet in iterator:
             if field == 'tweet_id' :
                 tweet_text_record.append(tweet['id'])                            
             elif field == 'user_id' :
-                tweet_text_record.append(tweet['user']['id'])
+                tweet_text_record.append(user_id)
             elif field == 'text' :
                 value = tweet['text'].strip()
                 tweet_text_record.append(value)
@@ -145,7 +148,7 @@ for tweet in iterator:
         
         
         user_record = []
-        user_data = tweet['user']
+        
         for field in user_fields_list :
             if field == 'created_at' :
                 datetime = parser.parse(user_data['created_at'])
@@ -166,7 +169,7 @@ for tweet in iterator:
                 url_count = 0
                 for url in tweet['entities']['urls'] :
                     url_count = url_count + 1
-                    urls.append([tweet['id'], url_count, url['expanded_url']])
+                    urls.append([tweet['id'], user_id, url_count, url['expanded_url']])
                     
                     
             if len(tweet['entities']['hashtags']) > 0  :                
@@ -177,7 +180,7 @@ for tweet in iterator:
                         inserted_hashtags[hash['text']] = hash_id =  cursor.lastrowid                        
                     else :
                         hash_id = inserted_hashtags[hash['text']]
-                    hashtags.append([tweet['id'], tweet['user']['id'], hash_id ])
+                    hashtags.append([tweet['id'], user_id, hash_id ])
                             
         if count > 5 :
             try:
