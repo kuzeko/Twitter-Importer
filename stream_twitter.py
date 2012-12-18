@@ -158,7 +158,8 @@ for tweet in iterator:
                 cursor.executemany(insert_tweets_texts_sql, tweet_texts)
             except Exception as e:
                 print  cursor._last_executed
-                print "An error occurred while exectuing the query\n error({0}): {1}".format(e.errno, e.strerror)            
+                print "An error occurred while exectuing the query:\n"
+                print e            
             break
     #else :
     #    print "What's this!?"
