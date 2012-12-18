@@ -49,7 +49,7 @@ insert_tweets_texts_sql = 'INSERT INTO tweet_text (' + tweet_text_fields + ') VA
 tweet_url_fields_list = ['tweet_id', 'progressive', 'url']
 tweet_url_fields = ', '.join(tweet_url_fields_list)
 tweet_url_placeholders = ', '.join(['%s']*len(tweet_url_fields_list))
-insert_tweets_urls_sql = 'INSERT INTO tweet_url (' + tweet_url_fields + ') VALUES ( ' + tweet_url_placeholders + ')'
+insert_tweets_urls_sql = 'INSERT INTO tweet_url (' + tweet_url_fields + ') VALUES ( ' + tweet_url_placeholders + ') ON DUPLICATE KEY UPDATE tweet_id=VALUES(tweet_id)'
 
 tweet_hashtag_fields_list = ['tweet_id', 'user_id', 'hashtag_id']
 tweet_hashtag_fields = ', '.join(tweet_hashtag_fields_list)
@@ -57,7 +57,7 @@ tweet_hashtag_placeholders = ', '.join(['%s']*len(tweet_hashtag_fields_list))
 insert_tweets_hashtags_sql = 'INSERT INTO tweet_hashtag (' + tweet_hashtag_fields + ') VALUES (' + tweet_hashtag_placeholders + ')'
 
 
-insert_hashtags_sql = 'INSERT INTO tweet_hashtag (hashtag) VALUES (%s)'
+insert_hashtags_sql = 'INSERT INTO tweet_hashtag (hashtag) VALUES (%s) ON DUPLICATE KEY UPDATE hashtag=VALUES(hashtag)'
 
 user_fields_list = ['id', 'screen_name', 'name', 'verified', 'protected', 'followers_count', 'friends_count', 'statuses_count', 'favourites_count', 'location', 'utc_offset', 'time_zone', 'geo_enabled', 'lang', 'description', 'url', 'created_at']
 user_fields = ', '.join(user_fields_list)
@@ -101,7 +101,8 @@ for tweet in iterator:
                 tweet_record.append(datetime)
             elif field in tweet :                                
                 tweet_record.append(tweet[field])
-
+        tweets.append(tweet_record)
+        
         for field in tweet_text_fields_list :
             if field == 'tweet_id' :
                 tweet_text_record.append(tweet['id'])                            
@@ -130,13 +131,10 @@ for tweet in iterator:
                     tweet_text_record.append('')                
             elif field in tweet :                                
                 tweet_text_record.append(tweet[field])            
-            else:
-                print field
-                print '++'
-                print tweet
-                print '++'
-                print tweet.keys()
-                break
+
+        tweet_texts.append(tweet_text_record)
+        
+
 
         count = count + 1        
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
@@ -147,6 +145,8 @@ for tweet in iterator:
                 print hash
         
         if count > 5 :
+            cursor.executemany(insert_tweets_sql, tweets)
+            cursor.executemany(insert_tweets_texts_sql, tweet_texts)    
             break
     #else :
     #    print "What's this!?"
