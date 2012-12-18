@@ -166,7 +166,7 @@ for tweet in iterator:
                 url_count = 0
                 for url in tweet['entities']['urls'] :
                     url_count = url_count + 1
-                    urls.append(tweet['id'], url_count, url['expanded_url'])
+                    urls.append([tweet['id'], url_count, url['expanded_url']])
                     
                     
             if len(tweet['entities']['hashtags']) > 0  :                
