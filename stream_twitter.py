@@ -40,7 +40,7 @@ tweet_fields = ', '.join(tweet_fields_list)
 tweet_placeholders = ', '.join(['%s']*len(tweet_fields_list))
 insert_tweets_sql = 'INSERT INTO tweet (' + tweet_fields + ') VALUES (' +  tweet_placeholders  + ')'
 
-tweet_text_fields_list = ['tweet_id', 'user_id', 'text', 'lat', 'long', 'place_full_name', 'place_id']
+tweet_text_fields_list = ['tweet_id', 'user_id', 'text', 'geo_lat', 'geo_long', 'place_full_name', 'place_id']
 tweet_text_fields = ', '.join(tweet_text_fields_list)
 tweet_text_placeholders = ', '.join(['%s']*len(tweet_text_fields_list))
 insert_tweets_texts_sql = 'INSERT INTO tweet_text (' + tweet_text_fields + ') VALUES (' + tweet_text_placeholders + ')'
@@ -112,12 +112,12 @@ for tweet in iterator:
                 tweet_text_record.append(tweet['id'])                            
             elif field == 'user_id' :
                 tweet_text_record.append(tweet['user']['id'])
-            elif field == 'lat' :
+            elif field == 'geo_lat' :
                 if tweet['geo'] != None:
                     tweet_text_record.append(tweet['geo']['coordinates'][0])
                 else :
                     tweet_text_record.append(0)
-            elif field == 'long' :
+            elif field == 'geo_long' :
                 if tweet['geo'] != None :
                     tweet_text_record.append(tweet['geo']['coordinates'][1])
                 else :

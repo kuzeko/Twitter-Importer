@@ -38,8 +38,8 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_text` (
   `tweet_id` BIGINT UNSIGNED NOT NULL ,
   `user_id` BIGINT UNSIGNED NOT NULL ,
   `text` VARCHAR(160) NOT NULL DEFAULT '' ,
-  `lat` DECIMAL(18,12) NULL ,
-  `long` DECIMAL(18,12) NULL ,
+  `geo_lat` DECIMAL(18,12) NOT NULL DEFAULT 0 ,
+  `geo_long` DECIMAL(18,12) NOT NULL DEFAULT 0 ,
   `place_full_name` VARCHAR(160) NULL ,
   `place_id` VARCHAR(160) NULL ,
   PRIMARY KEY (`tweet_id`, `user_id`) )
@@ -82,9 +82,8 @@ DROP TABLE IF EXISTS `twitter`.`tweet_hashtag` ;
 
 CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_hashtag` (
   `tweet_id` BIGINT UNSIGNED NOT NULL ,
-  `user_id` BIGINT UNSIGNED NOT NULL ,
   `hashtag_id` BIGINT UNSIGNED NOT NULL ,
-  PRIMARY KEY (`tweet_id`, `hashtag_id`, `user_id`) )
+  PRIMARY KEY (`tweet_id`, `hashtag_id`) )
 ENGINE = MyISAM;
 
 
