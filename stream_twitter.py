@@ -165,11 +165,10 @@ for tweet in iterator:
                 value = highpoints.sub(u'', value)
                 user_record.append(value)
             elif field == 'utc_offset' :
-                if user_data['utc_offset'] == '' :
+                if user_data['utc_offset'] == None or  user_data['utc_offset'] == '':
                     user_record.append(0)
                 else :  
                     user_record.append(user_data['utc_offset'])
-
             elif field in user_data :
                 if user_data[field] == None :
                     value = ''
