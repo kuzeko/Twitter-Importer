@@ -123,6 +123,7 @@ for tweet in iterator:
                     tweet_text_record.append('')                
             elif field in tweet :                                
                 tweet_text_record.append(tweet[field])            
+                '''
             else:
                 print field
                 print '++'
@@ -131,7 +132,7 @@ for tweet in iterator:
                 print tweet.keys()
                 break
 
-                '''
+
                     elif field == 'lat' :
                     if tweet['geo'] != None and len(tweet['geo']) >0:
                         tweet_text_record.append(tweet['geo'][0])
@@ -168,4 +169,7 @@ for tweet in iterator:
 print "-------"
 print count
 
+
+
 #Todo Save to DB
+#cursor.lastrowid
