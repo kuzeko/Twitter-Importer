@@ -114,10 +114,10 @@ for tweet in iterator:
 
         if count > 5 :
             break
-    else :
-        print "What's this!?"
-        print tweet
-        break
+    #else :
+    #    print "What's this!?"
+    #    print tweet
+    #    break
              
 print "-------"
 print count
