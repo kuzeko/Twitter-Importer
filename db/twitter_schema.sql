@@ -62,7 +62,7 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`user` (
   `statuses_count` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `favourites_count` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `location` VARCHAR(160) NULL ,
-  `utc_offset` INT UNSIGNED NOT NULL DEFAULT 0 ,
+  `utc_offset` INT NOT NULL DEFAULT 0 ,
   `time_zone` VARCHAR(45) NULL ,
   `geo_enabled` TINYINT(1) NOT NULL DEFAULT false ,
   `lang` CHAR(2) NOT NULL DEFAULT '--' ,
