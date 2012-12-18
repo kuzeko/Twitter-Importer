@@ -119,6 +119,15 @@ for tweet in iterator:
                     tweet_text_record.append(0)
             elif field == 'place_full_name' :
                 if tweet['place'] != None :
+                    print tweet['place']
+                    break
+                    tweet_text_record.append(tweet['place'][field])
+                else :
+                    tweet_text_record.append('')                
+            elif field == 'place_id' :
+                if tweet['place'] != None :
+                    print tweet['place']
+                    break
                     tweet_text_record.append(tweet['place'][field])
                 else :
                     tweet_text_record.append('')                
