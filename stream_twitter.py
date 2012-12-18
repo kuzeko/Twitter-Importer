@@ -108,9 +108,15 @@ for tweet in iterator:
             elif field == 'user_id' :
                 tweet_text_record.append(tweet['user']['id'])
             elif field == 'lat' :
-                continue
+                if tweet['geo'] != None:
+                    tweet_text_record.append(tweet['geo']['coordinates'][0])
+                else :
+                    tweet_text_record.append(0)
             elif field == 'long' :
-                continue        
+                if tweet['geo'] != None :
+                    tweet_text_record.append(tweet['geo']['coordinates'][1])
+                else :
+                    tweet_text_record.append(0)            
             elif field == 'place_full_name' :
                 if tweet['place'] != None :
                     tweet_text_record.append(tweet['place']['full_name'])
@@ -132,30 +138,14 @@ for tweet in iterator:
                 print tweet.keys()
                 break
 
-                '''
-                elif field == 'lat' :
-                    if tweet['geo'] != None and len(tweet['geo']) >0:
-                        tweet_text_record.append(tweet['geo'][0])
-                    else :
-                        tweet_text_record.append(0)
-                elif field == 'long' :
-                    if tweet['geo'] != None and len(tweet['geo']) >0 :
-                        tweet_text_record.append(tweet['geo'][1])
-                    else :
-                        tweet_text_record.append(0)
-                '''
-
-        if tweet['geo'] != None :
-            count = count + 1
-            print tweet['geo']
-        '''
+        count = count + 1        
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
             for url in tweet['entities']['urls'] :
                 print url
         if len(tweet['entities']) >0 and len(tweet['entities']['hashtags']) > 0  :                
             for hash in tweet['entities']['hashtags'] :
                 print hash
-        '''
+        
         if count > 5 :
             break
     #else :
