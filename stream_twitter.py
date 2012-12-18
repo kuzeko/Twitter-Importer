@@ -116,7 +116,12 @@ for tweet in iterator:
                 if tweet['geo'] != None :
                     tweet_text_record.append(tweet['geo'][1])
                 else :
-                    tweet_text_record.append(0)                    
+                    tweet_text_record.append(0)
+            elif field == 'place_full_name' :
+                if tweet['place'] != None :
+                    tweet_text_record.append(tweet['place'][field])
+                else :
+                    tweet_text_record.append('')                
             elif field in tweet :                                
                 tweet_text_record.append(tweet[field])            
             else:
