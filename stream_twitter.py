@@ -92,7 +92,7 @@ for tweet in iterator:
         tweet_text_record   = []
         
         user_data = tweet['user']
-        user_id = user_data[id]
+        user_id = user_data['id']
         
         for field in tweet_fields_list :
             if field == 'user_id' :
