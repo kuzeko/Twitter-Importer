@@ -53,22 +53,22 @@ DROP TABLE IF EXISTS `twitter`.`user` ;
 
 CREATE  TABLE IF NOT EXISTS `twitter`.`user` (
   `id` BIGINT UNSIGNED NOT NULL ,
-  `screen_name` VARCHAR(45) NULL ,
-  `name` VARCHAR(160) NULL ,
-  `verified` TINYINT(1) NULL ,
-  `protected` TINYINT(1) NULL ,
+  `screen_name` VARCHAR(45) NOT NULL ,
+  `name` VARCHAR(160) NOT NULL ,
+  `verified` TINYINT(1) NOT NULL DEFAULT false ,
+  `protected` TINYINT(1) NOT NULL DEFAULT false ,
   `followers_count` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `friends_count` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `statuses_count` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `favourites_count` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `location` VARCHAR(160) NULL ,
-  `utc_offset` INT UNSIGNED NOT NULL ,
+  `utc_offset` INT UNSIGNED NOT NULL DEFAULT 0 ,
   `time_zone` VARCHAR(45) NULL ,
-  `geo_enabled` TINYINT(1) NULL ,
-  `lang` CHAR(2) NULL ,
+  `geo_enabled` TINYINT(1) NOT NULL DEFAULT false ,
+  `lang` CHAR(2) NOT NULL DEFAULT '--' ,
   `description` VARCHAR(160) NULL ,
   `url` VARCHAR(160) NULL ,
-  `created_at` DATETIME NULL ,
+  `created_at` DATETIME NOT NULL ,
   PRIMARY KEY (`id`) )
 ENGINE = MyISAM;
 
@@ -82,8 +82,9 @@ DROP TABLE IF EXISTS `twitter`.`tweet_hashtag` ;
 
 CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_hashtag` (
   `tweet_id` BIGINT UNSIGNED NOT NULL ,
+  `user_id` BIGINT UNSIGNED NOT NULL ,
   `hashtag_id` BIGINT UNSIGNED NOT NULL ,
-  PRIMARY KEY (`tweet_id`, `hashtag_id`) )
+  PRIMARY KEY (`tweet_id`, `user_id`, `hashtag_id`) )
 ENGINE = MyISAM;
 
 
@@ -108,9 +109,10 @@ DROP TABLE IF EXISTS `twitter`.`tweet_url` ;
 
 CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_url` (
   `tweet_id` BIGINT UNSIGNED NOT NULL ,
+  `user_id` BIGINT UNSIGNED NOT NULL ,
   `progressive` SMALLINT UNSIGNED NOT NULL ,
   `url` TEXT NULL ,
-  PRIMARY KEY (`tweet_id`, `progressive`) )
+  PRIMARY KEY (`tweet_id`, `user_id`, `progressive`) )
 ENGINE = MyISAM;
 
 
