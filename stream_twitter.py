@@ -103,6 +103,8 @@ for tweet in iterator:
                 tweet_record.append(tweet[field])
 
         for field in tweet_text_fields_list :
+            if field == 'tweet_id' :
+                tweet_text_record.append(tweet['id'])                            
             if field == 'user_id' :
                 tweet_text_record.append(tweet['user']['id'])
             elif field in tweet :                                
