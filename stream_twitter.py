@@ -112,7 +112,7 @@ for tweet in iterator:
             elif field == 'user_id' :
                 tweet_text_record.append(tweet['user']['id'])
             elif field == 'text' :
-                value = tweet['text'].trim()
+                value = tweet['text'].strip()
                 tweet_text_record.append(value)
             elif field == 'geo_lat' :
                 if tweet['geo'] != None:
