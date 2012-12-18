@@ -107,16 +107,6 @@ for tweet in iterator:
                 tweet_text_record.append(tweet['id'])                            
             elif field == 'user_id' :
                 tweet_text_record.append(tweet['user']['id'])
-            elif field == 'lat' :
-                if tweet['geo'] != None and len(tweet['geo']) >0:
-                    tweet_text_record.append(tweet['geo'][0])
-                else :
-                    tweet_text_record.append(0)
-            elif field == 'long' :
-                if tweet['geo'] != None and len(tweet['geo']) >0 :
-                    tweet_text_record.append(tweet['geo'][1])
-                else :
-                    tweet_text_record.append(0)
             elif field == 'place_full_name' :
                 if tweet['place'] != None :
                     print tweet['place']
@@ -141,18 +131,33 @@ for tweet in iterator:
                 print tweet.keys()
                 break
 
+                '''
+                    elif field == 'lat' :
+                    if tweet['geo'] != None and len(tweet['geo']) >0:
+                        tweet_text_record.append(tweet['geo'][0])
+                    else :
+                        tweet_text_record.append(0)
+                elif field == 'long' :
+                    if tweet['geo'] != None and len(tweet['geo']) >0 :
+                        tweet_text_record.append(tweet['geo'][1])
+                    else :
+                        tweet_text_record.append(0)
+               '''
+
+
         if tweet['place'] != None :
             count = count + 1
             print tweet['place']
         if tweet['geo'] != None and len(tweet['geo']) >0 :
             print tweet['geo']
+        '''
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
             for url in tweet['entities']['urls'] :
                 print url
         if len(tweet['entities']) >0 and len(tweet['entities']['hashtags']) > 0  :                
             for hash in tweet['entities']['hashtags'] :
                 print hash
-
+        '''
         if count > 5 :
             break
     #else :
