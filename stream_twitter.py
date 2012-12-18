@@ -127,9 +127,10 @@ for tweet in iterator:
                 print tweet.keys()
                 break
 
-
+        if tweet['place'] != None :
+            print tweet['place']
         if tweet['geo'] != None and len(tweet['geo']) >0 :
-            print tweet
+            print tweet['geo']
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
             for url in tweet['entities']['urls'] :
                 print url
