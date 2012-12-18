@@ -107,23 +107,23 @@ for tweet in iterator:
                 tweet_text_record.append(tweet['id'])                            
             elif field == 'user_id' :
                 tweet_text_record.append(tweet['user']['id'])
+            elif field == 'lat' :
+                continue
+            elif field == 'long' :
+                continue        
             elif field == 'place_full_name' :
                 if tweet['place'] != None :
-                    print tweet['place']
-                    break
-                    tweet_text_record.append(tweet['place'][field])
+                    tweet_text_record.append(tweet['place']['full_name'])
                 else :
                     tweet_text_record.append('')                
             elif field == 'place_id' :
+                # http://api.twitter.com/1/geo/id/6b9ed4869788d40e.json
                 if tweet['place'] != None :
-                    print tweet['place']
-                    break
-                    tweet_text_record.append(tweet['place'][field])
+                    tweet_text_record.append(tweet['place']['id'])
                 else :
                     tweet_text_record.append('')                
             elif field in tweet :                                
                 tweet_text_record.append(tweet[field])            
-                '''
             else:
                 print field
                 print '++'
@@ -132,8 +132,8 @@ for tweet in iterator:
                 print tweet.keys()
                 break
 
-
-                    elif field == 'lat' :
+                '''
+                elif field == 'lat' :
                     if tweet['geo'] != None and len(tweet['geo']) >0:
                         tweet_text_record.append(tweet['geo'][0])
                     else :
@@ -143,13 +143,10 @@ for tweet in iterator:
                         tweet_text_record.append(tweet['geo'][1])
                     else :
                         tweet_text_record.append(0)
-               '''
+                '''
 
-
-        if tweet['place'] != None :
+        if tweet['geo'] != None :
             count = count + 1
-            print tweet['place']
-        if tweet['geo'] != None and len(tweet['geo']) >0 :
             print tweet['geo']
         '''
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
