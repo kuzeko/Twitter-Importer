@@ -108,13 +108,13 @@ for tweet in iterator:
             elif field == 'user_id' :
                 tweet_text_record.append(tweet['user']['id'])
             elif field == 'lat' :
-                if tweet['coordinates'] != None :
-                    tweet_text_record.append(tweet['coordinates'][0])
+                if tweet['geo'] != None :
+                    tweet_text_record.append(tweet['geo'][0])
                 else :
                     tweet_text_record.append(0)
             elif field == 'long' :
-                if tweet['coordinates'] != None :
-                    tweet_text_record.append(tweet['coordinates'][1])
+                if tweet['geo'] != None :
+                    tweet_text_record.append(tweet['geo'][1])
                 else :
                     tweet_text_record.append(0)                    
             elif field in tweet :                                
@@ -128,8 +128,8 @@ for tweet in iterator:
                 break
 
 
-        if len(tweet['coordinates']) >0 :
-            print tweet['coordinates']            
+        if tweet['geo'] != None and len(tweet['geo']) >0 :
+            print tweet
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
             for url in tweet['entities']['urls'] :
                 print url
