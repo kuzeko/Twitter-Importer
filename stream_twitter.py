@@ -101,7 +101,7 @@ for tweet in iterator:
                 tweet_record.append(datetime)
             elif field in tweet :   
                 if tweet[field] == None :
-                    value = ''
+                    value = 'NULL'
                 else :
                     value = tweet[field]                             
                 tweet_record.append(value)
@@ -135,7 +135,7 @@ for tweet in iterator:
                     tweet_text_record.append('')                
             elif field in tweet :
                 if tweet[field] == None :
-                    value = ''
+                    value = 'NULL'
                 else :
                     value = tweet[field]                             
                 tweet_text_record.append(value)            
