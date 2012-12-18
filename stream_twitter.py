@@ -99,8 +99,12 @@ for tweet in iterator:
                 datetime = parser.parse(tweet['created_at'])
                 datetime = datetime.isoformat(' ')[:-6]
                 tweet_record.append(datetime)
-            elif field in tweet :                                
-                tweet_record.append(tweet[field])
+            elif field in tweet :   
+                if tweet[field] == None :
+                    value = ''
+                else :
+                    value = tweet[field]                             
+                tweet_record.append(value)
         tweets.append(tweet_record)
         
         for field in tweet_text_fields_list :
@@ -129,8 +133,12 @@ for tweet in iterator:
                     tweet_text_record.append(tweet['place']['id'])
                 else :
                     tweet_text_record.append('')                
-            elif field in tweet :                                
-                tweet_text_record.append(tweet[field])            
+            elif field in tweet :
+                if tweet[field] == None :
+                    value = ''
+                else :
+                    value = tweet[field]                             
+                tweet_text_record.append(value)            
 
         tweet_texts.append(tweet_text_record)
         
