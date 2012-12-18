@@ -95,9 +95,9 @@ for tweet in iterator:
             if field == 'created_at' :
                 datetime = parser.parse(tweet['created_at'])
                 datetime = datetime.isoformat(' ')[:-6]
-                tweet_record.apped(datetime)
+                tweet_record.append(datetime)
             elif field in tweet :                                
-                tweet_record.apped(tweet[field])
+                tweet_record.append(tweet[field])
             else:
                 print field
                 print '++'
