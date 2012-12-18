@@ -76,18 +76,21 @@ iterator = twitter_stream.statuses.sample()
 # Use the stream
 timer = datetime.datetime.now()
 
-tweets = []
-tweet_record = []
-tweet_texts = []
-urls = {}
-hashtags = {}
-users = {}
+tweets              = []
+tweet_record        = []
+tweet_texts         = []
+tweet_text_record   = []
+urls                = {}
+hashtags            = {}
+users               = {}
 
 
 count = 0
 for tweet in iterator:
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
         count = count + 1
+        tweet_record = []
+        tweet_text_record   = []
         
         for field in tweet_fields_list :
             if field == 'user_id' :
@@ -98,6 +101,12 @@ for tweet in iterator:
                 tweet_record.append(datetime)
             elif field in tweet :                                
                 tweet_record.append(tweet[field])
+
+        for field in tweet_text_fields_list :
+            if field == 'user_id' :
+                tweet_text_record.append(tweet['user']['id'])
+            elif field in tweet :                                
+                tweet_text_record.append(tweet[field])            
             else:
                 print field
                 print '++'
@@ -106,9 +115,12 @@ for tweet in iterator:
                 print tweet.keys()
                 break
 
+
+
         if len(tweet['entities']) >0 and len(tweet['entities']['urls']) > 0  :
             for url in tweet['entities']['urls'] :
                 print url
+        if len(tweet['entities']) >0 and len(tweet['entities']['hashtags']) > 0  :                
             for hash in tweet['entities']['hashtags'] :
                 print hash
 
