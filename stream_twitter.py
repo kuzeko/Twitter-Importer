@@ -1,11 +1,13 @@
 import gc
 import os
+import re
 import sys
 import logging
 import datetime
 import dateutil.parser as parser
 import ConfigParser
 import MySQLdb
+
 
 from twitter import *
 
@@ -15,6 +17,9 @@ logger = logging.getLogger('user')
 logger.info( "Reading configurations..")
 config = ConfigParser.ConfigParser()
 file = config.read('config/twitter_config.cfg')
+
+highpoints = re.compile(u'[\U00010000-\U0010ffff]')
+
 
 DB_HOST             = config.get('DB_Config', 'db_host')
 DB_NAME             = config.get('DB_Config', 'db_name')
@@ -116,6 +121,7 @@ for tweet in iterator:
                 tweet_text_record.append(user_id)
             elif field == 'text' :
                 value = tweet['text'].strip()
+                value = highpoints.sub(u'', value)
                 tweet_text_record.append(value)
             elif field == 'geo_lat' :
                 if tweet['geo'] != None:
@@ -154,6 +160,16 @@ for tweet in iterator:
                 datetime = parser.parse(user_data['created_at'])
                 datetime = datetime.isoformat(' ')[:-6]
                 user_record.append(datetime)            
+            elif field == 'description' :
+                value = user_data['description'].strip()
+                value = highpoints.sub(u'', value)
+                user_record.append(value)
+            elif field == 'utc_offset' :
+                if user_data['utc_offset'] == '' :
+                    user_record.append(0)
+                else :  
+                    user_record.append(user_data['utc_offset'])
+
             elif field in user_data :
                 if user_data[field] == None :
                     value = ''
