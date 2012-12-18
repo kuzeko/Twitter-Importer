@@ -153,8 +153,11 @@ for tweet in iterator:
                 print hash
         
         if count > 5 :
-            cursor.executemany(insert_tweets_sql, tweets)
-            cursor.executemany(insert_tweets_texts_sql, tweet_texts)    
+            try:
+                cursor.executemany(insert_tweets_sql, tweets)
+                cursor.executemany(insert_tweets_texts_sql, tweet_texts)
+            except Exception :
+                print  cursor._last_executed
             break
     #else :
     #    print "What's this!?"
