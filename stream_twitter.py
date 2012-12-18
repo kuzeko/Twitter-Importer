@@ -55,7 +55,7 @@ tweet_hashtag_fields = ', '.join(tweet_hashtag_fields_list)
 tweet_hashtag_placeholders = ', '.join(['%s']*len(tweet_hashtag_fields_list))
 insert_tweets_hashtags_sql = 'INSERT INTO tweet_hashtag (' + tweet_hashtag_fields + ') VALUES (' + tweet_hashtag_placeholders + ')'
 
-insert_hashtags_sql = 'INSERT INTO tweet_hashtag (hashtag) VALUES (%s) ON DUPLICATE KEY UPDATE hashtag=VALUES(hashtag)'
+insert_hashtags_sql = 'INSERT INTO hashtag (hashtag) VALUES (%s) ON DUPLICATE KEY UPDATE hashtag=VALUES(hashtag)'
 
 user_fields_list = ['id', 'screen_name', 'name', 'verified', 'protected', 'followers_count', 'friends_count', 'statuses_count', 'favourites_count', 'location', 'utc_offset', 'time_zone', 'geo_enabled', 'lang', 'description', 'url', 'created_at']
 user_fields = ', '.join(user_fields_list)
