@@ -193,15 +193,16 @@ for tweet in iterator:
 
             if len(tweet['entities']['hashtags']) > 0  :
                 for hash in tweet['entities']['hashtags'] :
-                    hash_id = 0
-                    conn_inser_id = conn.insert_id()
-                    cursor_lastrowid = cursor.lastrowid
-                    
+                    hash_id = 0                    
                     if not hash['text'] in inserted_hashtags :
                         cursor.execute(insert_hashtags_sql, [hash['text']])
                         conn.commit()
-                        inserted_hashtags[hash['text']] = hash_id =  conn_inser_id
+                        conn_inser_id = conn.insert_id()
+                        cursor_lastrowid = cursor.lastrowid                        
+                        inserted_hashtags[hash['text']] = hash_id =  cursor_lastrowid
                         logger.info("lastrowid: {0}  - insert_id {1}".format(cursor_lastrowid, conn_inser_id ))
+                        if cursor_lastrowid == None or cursor_lastrowid == 0 :
+                            raise Exception('Lastrowid is {0} for {1} ', cursor_lastrowid, hash['text'] )
                     else :
                         hash_id = inserted_hashtags[hash['text']]
                     hashtags.append([tweet['id'], user_id, hash_id ])
