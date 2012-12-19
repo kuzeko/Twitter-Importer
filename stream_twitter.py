@@ -2,6 +2,7 @@ import gc
 import os
 import re
 import sys
+import warnings
 import logging
 import datetime
 import dateutil.parser as parser
@@ -13,6 +14,8 @@ from twitter import *
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger = logging.getLogger('user')
+
+warnings.filterwarnings('error', category=MySQLdb.Warning)
 
 logger.info( "Reading configurations..")
 config = ConfigParser.ConfigParser()
@@ -193,29 +196,34 @@ for tweet in iterator:
                     hash_id = 0
                     if not hash['text'] in inserted_hashtags :
                         cursor.execute(insert_hashtags_sql, [hash['text']])
+                        conn.commit()
                         inserted_hashtags[hash['text']] = hash_id =  cursor.lastrowid
                     else :
                         hash_id = inserted_hashtags[hash['text']]
                     hashtags.append([tweet['id'], user_id, hash_id ])
 
+
         if count > 1000 :
             try:
-                logger.info("Inserting %d tweets ".format(len(tweets)))
+                logger.info("Inserting {0} tweets ".format(len(tweets)))
                 cursor.executemany(insert_tweets_sql, tweets)
                 
-                logger.info("Inserting %d tweet texts ".format(len(tweet_texts)))
+                logger.info("Inserting {0} tweet texts ".format(len(tweet_texts)))
                 cursor.executemany(insert_tweets_texts_sql, tweet_texts)
                 
-                logger.info("Inserting %d tweet urls ".format(len(urls)))
+                logger.info("Inserting {0} tweet urls ".format(len(urls)))
                 cursor.executemany(insert_tweets_urls_sql, urls)
                 
-                logger.info("Inserting %d tweet hashtags ".format(len(hashtags)))
+                logger.info("Inserting {0} tweet hashtags ".format(len(hashtags)))
                 cursor.executemany(insert_tweets_hashtags_sql, hashtags)
                 
                 list_users = users.values()
-                logger.info("Inserting %d users ".format(len(list_users)))                
+                logger.info("Inserting {0} users ".format(len(list_users)))                
                 cursor.executemany(insert_users_sql, list_users)
-
+                
+                logger.info("Commit..")
+                conn.commit()
+                
                 tweets              = []
                 tweet_texts         = []
                 urls                = []
@@ -225,14 +233,16 @@ for tweet in iterator:
 
                 total_inserted = total_inserted + count
                 count = 0
-                logger.info("Inserted %d tweets up to now ".format(total_inserted))                
+                logger.info("Inserted {0} tweets up to now ".format(total_inserted))                
 
-            except Exception as e:                
-                logger.error("An error occurred while exectuing the query:\n")
+            except Exception as e:
+                conn.rollback()                
+                logger.error("An error occurred while exectuing the query:")
                 logger.error(cursor._last_executed)
                 logger.error(e)
+                cursor.close()
 
-            break
+                break
     #else :
     #    print "What's this!?"
     #    print tweet
@@ -240,6 +250,8 @@ for tweet in iterator:
 
 print "-------"
 print count
+cursor.close()
+
 
 
 
