@@ -197,14 +197,20 @@ for tweet in iterator:
                     if not hash['text'] in inserted_hashtags :
                         cursor.execute(insert_hashtags_sql, [hash['text']])
                         conn.commit()
-                        conn_inser_id = conn.insert_id()
                         cursor_lastrowid = cursor.lastrowid                        
                         inserted_hashtags[hash['text']] = hash_id =  cursor_lastrowid
-                        logger.info("lastrowid: {0}  - insert_id {1}".format(cursor_lastrowid, conn_inser_id ))
+                        
                         if cursor_lastrowid == None or cursor_lastrowid == 0 :
-                            raise Exception('Lastrowid is {0} for {1} ', cursor_lastrowid, hash['text'] )
+                            logger.info("Looking for  {0} in the databse ".format(hash['text']))
+                            cursor.execute("SELECT id FROM hashtag h WHERE h.hashtag = %s", [hash['text']])
+                            inserted_hashtags[hash['text']] = hash_id = cur.fetchone()[0]
+                            
+                        if hash_id == None or hash_id == 0 :                            
+                            raise Exception("hash_id is {0} for {1} ".format(hash_id, hash['text']) )
                     else :
                         hash_id = inserted_hashtags[hash['text']]
+                    
+                        
                     hashtags.append([tweet['id'], user_id, hash_id ])
 
 
