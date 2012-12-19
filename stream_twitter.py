@@ -198,7 +198,7 @@ for tweet in iterator:
                         hash_id = inserted_hashtags[hash['text']]
                     hashtags.append([tweet['id'], user_id, hash_id ])
 
-        if count > 5000 :
+        if count > 1000 :
             try:
                 logger.info("Inserting %d tweets ".format(len(tweets)))
                 cursor.executemany(insert_tweets_sql, tweets)
