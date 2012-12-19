@@ -181,7 +181,8 @@ for tweet in iterator:
                 user_record.append(value)
         users[user_id]=user_record
 
-
+        #To avoid duplicates
+        tweet_hashtags_register = []
         count = count + 1
         if len(tweet['entities']) >0 :
             if len(tweet['entities']['urls']) > 0  :
@@ -194,25 +195,25 @@ for tweet in iterator:
             if len(tweet['entities']['hashtags']) > 0  :
                 for hash in tweet['entities']['hashtags'] :
                     hash_id = 0                    
-                    if not hash['text'] in inserted_hashtags :
-                        cursor.execute(insert_hashtags_sql, [hash['text']])
-                        conn.commit()
-                        cursor_lastrowid = cursor.lastrowid                        
-                        inserted_hashtags[hash['text']] = hash_id =  cursor_lastrowid
-                        
-                        if cursor_lastrowid == None or cursor_lastrowid == 0 :
-                            logger.info("Looking for  {0} in the databse ".format(hash['text']))
-                            cursor.execute("SELECT id FROM hashtag h WHERE h.hashtag = %s", [hash['text']])
-                            inserted_hashtags[hash['text']] = hash_id = cursor.fetchone()[0]
+                    if hash['text'] not in tweet_hashtags_register :
+                        if not hash['text'] in inserted_hashtags :
+                            cursor.execute(insert_hashtags_sql, [hash['text']])
+                            conn.commit()
+                            cursor_lastrowid = cursor.lastrowid                        
+                            inserted_hashtags[hash['text']] = hash_id =  cursor_lastrowid
                             
-                        if hash_id == None or hash_id == 0 :                            
-                            raise Exception("hash_id is {0} for {1} ".format(hash_id, hash['text']) )
-                    else :
-                        hash_id = inserted_hashtags[hash['text']]
-                    
+                            if cursor_lastrowid == None or cursor_lastrowid == 0 :
+                                logger.info("Looking for  {0} in the databse ".format(hash['text']))
+                                cursor.execute("SELECT id FROM hashtag h WHERE h.hashtag = %s", [hash['text']])
+                                inserted_hashtags[hash['text']] = hash_id = cursor.fetchone()[0]
+                                
+                            if hash_id == None or hash_id == 0 :                            
+                                raise Exception("hash_id is {0} for {1} ".format(hash_id, hash['text']) )
+                        else :
+                            hash_id = inserted_hashtags[hash['text']]
                         
-                    hashtags.append([tweet['id'], user_id, hash_id ])
-
+                        hashtags.append([tweet['id'], user_id, hash_id ])
+                        tweet_hashtags_register.append(hash['text'])
 
         if count > 1000 :
             try:
