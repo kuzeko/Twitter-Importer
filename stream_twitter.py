@@ -74,10 +74,9 @@ insert_users_sql = 'INSERT INTO user (' + user_fields + ') VALUES (' + user_plac
 logger.info( "Connecting to the stream...")
 twitter_stream = TwitterStream(auth=oauth)
 iterator = twitter_stream.statuses.sample()
+logger.info("Got connection!")
 
 # Use the stream
-timer = datetime.datetime.now()
-
 tweets              = []
 tweet_record        = []
 tweet_texts         = []
@@ -90,6 +89,8 @@ users               = {}
 
 count = 0
 total_inserted = 0
+
+logger.info("Iterating through tweets")
 for tweet in iterator:
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
 
@@ -199,11 +200,21 @@ for tweet in iterator:
 
         if count > 5000 :
             try:
+                logger.info("Inserting %d tweets ".format(len(tweets)))
                 cursor.executemany(insert_tweets_sql, tweets)
+                
+                logger.info("Inserting %d tweet texts ".format(len(tweet_texts)))
                 cursor.executemany(insert_tweets_texts_sql, tweet_texts)
+                
+                logger.info("Inserting %d tweet urls ".format(len(urls)))
                 cursor.executemany(insert_tweets_urls_sql, urls)
+                
+                logger.info("Inserting %d tweet hashtags ".format(len(hashtags)))
                 cursor.executemany(insert_tweets_hashtags_sql, hashtags)
-                cursor.executemany(insert_users_sql, users.values())
+                
+                list_users = users.values()
+                logger.info("Inserting %d users ".format(len(list_users)))                
+                cursor.executemany(insert_users_sql, list_users)
 
                 tweets              = []
                 tweet_texts         = []
@@ -214,12 +225,13 @@ for tweet in iterator:
 
                 total_inserted = total_inserted + count
                 count = 0
-                print total_inserted
+                logger.info("Inserted %d tweets up to now ".format(total_inserted))                
 
-            except Exception as e:
-                print  cursor._last_executed
-                print "An error occurred while exectuing the query:\n"
-                print e
+            except Exception as e:                
+                logger.error("An error occurred while exectuing the query:\n")
+                logger.error(cursor._last_executed)
+                logger.error(e)
+
             break
     #else :
     #    print "What's this!?"
