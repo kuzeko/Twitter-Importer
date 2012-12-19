@@ -203,7 +203,7 @@ for tweet in iterator:
                         if cursor_lastrowid == None or cursor_lastrowid == 0 :
                             logger.info("Looking for  {0} in the databse ".format(hash['text']))
                             cursor.execute("SELECT id FROM hashtag h WHERE h.hashtag = %s", [hash['text']])
-                            inserted_hashtags[hash['text']] = hash_id = cur.fetchone()[0]
+                            inserted_hashtags[hash['text']] = hash_id = cursor.fetchone()[0]
                             
                         if hash_id == None or hash_id == 0 :                            
                             raise Exception("hash_id is {0} for {1} ".format(hash_id, hash['text']) )
