@@ -201,7 +201,7 @@ for tweet in iterator:
                         cursor.execute(insert_hashtags_sql, [hash['text']])
                         conn.commit()
                         inserted_hashtags[hash['text']] = hash_id =  conn_inser_id
-                        logger.info("lastrowid: {0}  - insert_id {1}", cursor_lastrowid, conn_inser_id )
+                        logger.info("lastrowid: {0}  - insert_id {1}".format(cursor_lastrowid, conn_inser_id ))
                     else :
                         hash_id = inserted_hashtags[hash['text']]
                     hashtags.append([tweet['id'], user_id, hash_id ])
