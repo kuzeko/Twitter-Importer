@@ -65,7 +65,6 @@ insert_hashtags_sql = 'INSERT INTO hashtag (hashtag) VALUES (%s) ON DUPLICATE KE
 user_fields_list = ['id', 'screen_name', 'name', 'verified', 'protected', 'followers_count', 'friends_count', 'statuses_count', 'favourites_count', 'location', 'utc_offset', 'time_zone', 'geo_enabled', 'lang', 'description', 'url', 'created_at']
 user_fields = ', '.join(user_fields_list)
 user_placeholders = ', '.join(['%s']*len(user_fields_list))
-
 insert_users_sql = 'INSERT INTO user (' + user_fields + ') VALUES (' + user_placeholders + ')'
 
 
@@ -90,15 +89,16 @@ users               = {}
 
 
 count = 0
+total_inserted = 0
 for tweet in iterator:
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
-        
+
         tweet_record = []
         tweet_text_record   = []
-        
+
         user_data = tweet['user']
         user_id = user_data['id']
-        
+
         for field in tweet_fields_list :
             if field == 'user_id' :
                 tweet_record.append(user_id)
@@ -106,17 +106,17 @@ for tweet in iterator:
                 datetime = parser.parse(tweet['created_at'])
                 datetime = datetime.isoformat(' ')[:-6]
                 tweet_record.append(datetime)
-            elif field in tweet :   
+            elif field in tweet :
                 if tweet[field] == None :
                     value = 0
                 else :
-                    value = tweet[field]                             
+                    value = tweet[field]
                 tweet_record.append(value)
         tweets.append(tweet_record)
-        
+
         for field in tweet_text_fields_list :
             if field == 'tweet_id' :
-                tweet_text_record.append(tweet['id'])                            
+                tweet_text_record.append(tweet['id'])
             elif field == 'user_id' :
                 tweet_text_record.append(user_id)
             elif field == 'text' :
@@ -132,34 +132,34 @@ for tweet in iterator:
                 if tweet['geo'] != None :
                     tweet_text_record.append(tweet['geo']['coordinates'][1])
                 else :
-                    tweet_text_record.append(0)            
+                    tweet_text_record.append(0)
             elif field == 'place_full_name' :
                 if tweet['place'] != None :
                     tweet_text_record.append(tweet['place']['full_name'])
                 else :
-                    tweet_text_record.append('')                
+                    tweet_text_record.append('')
             elif field == 'place_id' :
                 # http://api.twitter.com/1/geo/id/6b9ed4869788d40e.json
                 if tweet['place'] != None :
                     tweet_text_record.append(tweet['place']['id'])
                 else :
-                    tweet_text_record.append('')                
+                    tweet_text_record.append('')
             elif field in tweet :
                 if tweet[field] == None :
                     value = 0
                 else :
-                    value = tweet[field]                             
-                tweet_text_record.append(value)            
+                    value = tweet[field]
+                tweet_text_record.append(value)
         tweet_texts.append(tweet_text_record)
-        
-        
+
+
         user_record = []
-        
+
         for field in user_fields_list :
             if field == 'created_at' :
                 datetime = parser.parse(user_data['created_at'])
                 datetime = datetime.isoformat(' ')[:-6]
-                user_record.append(datetime)            
+                user_record.append(datetime)
             elif field == 'description' :
                 value = user_data['description'].strip()
                 value = highpoints.sub(u'', value)
@@ -167,53 +167,65 @@ for tweet in iterator:
             elif field == 'utc_offset' :
                 if user_data['utc_offset'] == None or  user_data['utc_offset'] == '':
                     user_record.append(0)
-                else :  
+                else :
                     user_record.append(user_data['utc_offset'])
             elif field in user_data :
                 if user_data[field] == None :
                     value = ''
                 else :
-                    value = user_data[field]                             
-                user_record.append(value)            
-        users[user_data['id']]=user_record
+                    value = user_data[field]
+                user_record.append(value)
+        users[user_id]=user_record
 
 
-        count = count + 1        
+        count = count + 1
         if len(tweet['entities']) >0 :
             if len(tweet['entities']['urls']) > 0  :
                 url_count = 0
                 for url in tweet['entities']['urls'] :
                     url_count = url_count + 1
                     urls.append([tweet['id'], user_id, url_count, url['expanded_url']])
-                    
-                    
-            if len(tweet['entities']['hashtags']) > 0  :                
+
+
+            if len(tweet['entities']['hashtags']) > 0  :
                 for hash in tweet['entities']['hashtags'] :
                     hash_id = 0
                     if not hash['text'] in inserted_hashtags :
                         cursor.execute(insert_hashtags_sql, [hash['text']])
-                        inserted_hashtags[hash['text']] = hash_id =  cursor.lastrowid                        
+                        inserted_hashtags[hash['text']] = hash_id =  cursor.lastrowid
                     else :
                         hash_id = inserted_hashtags[hash['text']]
                     hashtags.append([tweet['id'], user_id, hash_id ])
-                            
-        if count > 5 :
+
+        if count > 5000 :
             try:
                 cursor.executemany(insert_tweets_sql, tweets)
                 cursor.executemany(insert_tweets_texts_sql, tweet_texts)
                 cursor.executemany(insert_tweets_urls_sql, urls)
                 cursor.executemany(insert_tweets_hashtags_sql, hashtags)
                 cursor.executemany(insert_users_sql, users.values())
+
+                tweets              = []
+                tweet_texts         = []
+                urls                = []
+                hashtags            = []
+                inserted_hashtags   = {}
+                users               = {}
+
+                total_inserted = total_inserted + count
+                count = 0
+                print total_inserted
+
             except Exception as e:
                 print  cursor._last_executed
                 print "An error occurred while exectuing the query:\n"
-                print e            
+                print e
             break
     #else :
     #    print "What's this!?"
     #    print tweet
     #    break
-             
+
 print "-------"
 print count
 
