@@ -164,6 +164,9 @@ for tweet in iterator:
                 datetime = parser.parse(user_data['created_at'])
                 datetime = datetime.isoformat(' ')[:-6]
                 user_record.append(datetime)
+            elif field == 'lang' :    
+                value = user_data['lang'][:2]                
+                user_record.append(value)
             elif field == 'description' :
                 value = user_data['description'].strip()
                 value = highpoints.sub(u'', value)
