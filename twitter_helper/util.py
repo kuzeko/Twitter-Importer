@@ -12,5 +12,6 @@ def random_line(afile, max_chars = 123, min_chars = 5):
 def prepare_quote(text_file, signature=" -- Hamlet", max_chars = 123, min_chars = 5,):
     line = random_line(text_file, max_chars, min_chars)
     number = random.randrange(1,1000,2)
-    line = "%d] " + line + signature
+    line = "{0}] " + line + signature
+    line = line.format(number)
     return line
