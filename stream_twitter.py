@@ -9,9 +9,10 @@ import dateutil.parser as parser
 import ConfigParser
 import MySQLdb
 import HTMLParser
-from time import time
 
+from time import time
 from twitter import *
+from twitter_helper import *
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger = logging.getLogger('user')
@@ -92,6 +93,7 @@ urls                = []
 hashtags            = []
 inserted_hashtags   = {}
 users               = {}
+missing_users       = []
 
 
 
@@ -110,91 +112,19 @@ for tweet in iterator:
         user_data = tweet['user']
         user_id = user_data['id']
 
-        for field in tweet_fields_list :
-            if field == 'user_id' :
-                tweet_record.append(user_id)
-            elif field == 'created_at' :
-                datetime = parser.parse(tweet['created_at'])
-                datetime = datetime.isoformat(' ')[:-6]
-                tweet_record.append(datetime)
-            elif field in tweet :
-                if tweet[field] == None :
-                    value = 0
-                else :
-                    value = tweet[field]
-                tweet_record.append(value)
+        tweet_record = parse_tweet_basic_infos(tweet, tweet_fields_list)        
         tweets.append(tweet_record)
 
-        for field in tweet_text_fields_list :
-            if field == 'tweet_id' :
-                tweet_text_record.append(tweet['id'])
-            elif field == 'user_id' :
-                tweet_text_record.append(user_id)
-            elif field == 'text' :
-                value = tweet['text'].strip()
-                value = highpoints.sub(u'', value)
-                value = html_parser.unescape(value)
-                tweet_text_record.append(value)
-            elif field == 'geo_lat' :
-                if tweet['geo'] != None:
-                    tweet_text_record.append(tweet['geo']['coordinates'][0])
-                else :
-                    tweet_text_record.append(0)
-            elif field == 'geo_long' :
-                if tweet['geo'] != None :
-                    tweet_text_record.append(tweet['geo']['coordinates'][1])
-                else :
-                    tweet_text_record.append(0)
-            elif field == 'place_full_name' :
-                if tweet['place'] != None :
-                    tweet_text_record.append(tweet['place']['full_name'])
-                else :
-                    tweet_text_record.append('')
-            elif field == 'place_id' :
-                # http://api.twitter.com/1/geo/id/6b9ed4869788d40e.json
-                if tweet['place'] != None :
-                    tweet_text_record.append(tweet['place']['id'])
-                else :
-                    tweet_text_record.append('')
-            elif field in tweet :
-                if tweet[field] == None :
-                    value = 0
-                else :
-                    value = tweet[field]
-                tweet_text_record.append(value)
+        tweet_text_record = parse_tweet_text_infos(tweet, tweet_text_fields_list )
         tweet_texts.append(tweet_text_record)
 
 
         user_record = []
-
-        for field in user_fields_list :
-            if field == 'created_at' :
-                datetime = parser.parse(user_data['created_at'])
-                datetime = datetime.isoformat(' ')[:-6]
-                user_record.append(datetime)
-            elif field == 'lang' :    
-                value = user_data['lang'][:2]                
-                user_record.append(value)
-            elif field == 'description' :
-                value = user_data['description'].strip()
-                value = highpoints.sub(u'', value)
-                value = html_parser.unescape(value)
-                user_record.append(value)
-            elif field == 'utc_offset' :
-                if user_data['utc_offset'] == None or  user_data['utc_offset'] == '':
-                    user_record.append(0)
-                else :
-                    user_record.append(user_data['utc_offset'])
-            elif field == 'url' :
-                value = user_data['url'][:159]                
-                user_record.append(value)                                    
-            elif field in user_data :
-                if user_data[field] == None :
-                    value = ''
-                else :
-                    value = user_data[field]
-                user_record.append(value)
-        users[user_id]=user_record
+        user_record = parse_user_infos(user_data, user_fields_list)
+        if user_record == None :
+            missing_users.append(user_id)
+        else :
+            users[user_id]=user_record
 
         #To avoid duplicates
         tweet_hashtags_register = []
@@ -242,20 +172,29 @@ for tweet in iterator:
             time_elapsed = time_elapsed /count
             logger.info("Downaloading time rate {0} ".format(time_elapsed))            
             
+            if len(missing_users) > 0 :
+                missing_count = len(missing_users)
+                for user_id in missing_users :
+                    if user_id not in users :
+                        missing_count = missing_count - 1                    
+                logger.info("Missing {0} users ".format(missing_count)
+                
+
+            
             try:
-                logger.info("Inserting {0} tweets and {1} texts ".format(len(tweets), len(tweet_texts)))
+                #logger.info("Inserting {0} tweets and {1} texts ".format(len(tweets), len(tweet_texts)))
                 time_start = time()
                 cursor.executemany(insert_tweets_sql, tweets)            
                 cursor.executemany(insert_tweets_texts_sql, tweet_texts)                
                 
-                logger.info("Inserting {0} tweet urls ".format(len(urls)))
+                #logger.info("Inserting {0} tweet urls ".format(len(urls)))
                 cursor.executemany(insert_tweets_urls_sql, urls)
                 
-                logger.info("Inserting {0} tweet hashtags ".format(len(hashtags)))
+                #logger.info("Inserting {0} tweet hashtags ".format(len(hashtags)))
                 cursor.executemany(insert_tweets_hashtags_sql, hashtags)
                 
                 list_users = users.values()
-                logger.info("Inserting {0} users ".format(len(list_users)))                
+                #logger.info("Inserting {0} users ".format(len(list_users)))                
                 cursor.executemany(insert_users_sql, list_users)
                 
                 logger.info("Commit..")
