@@ -51,12 +51,12 @@ logger.info( "...done!")
 tweet_fields_list = ['id', 'user_id', 'in_reply_to_status_id', 'in_reply_to_user_id', 'favorited', 'retweeted', 'retweet_count', 'lang', 'created_at']
 tweet_fields = ', '.join(tweet_fields_list)
 tweet_placeholders = ', '.join(['%s']*len(tweet_fields_list))
-insert_tweets_sql = 'INSERT INTO tweet (' + tweet_fields + ') VALUES (' +  tweet_placeholders  + ')'
+insert_tweets_sql = 'REPLACE INTO tweet (' + tweet_fields + ') VALUES (' +  tweet_placeholders  + ')'
 
 tweet_text_fields_list = ['tweet_id', 'user_id', 'text', 'geo_lat', 'geo_long', 'place_full_name', 'place_id']
 tweet_text_fields = ', '.join(tweet_text_fields_list)
 tweet_text_placeholders = ', '.join(['%s']*len(tweet_text_fields_list))
-insert_tweets_texts_sql = 'INSERT INTO tweet_text (' + tweet_text_fields + ') VALUES (' + tweet_text_placeholders + ')'
+insert_tweets_texts_sql = 'REPLACE INTO tweet_text (' + tweet_text_fields + ') VALUES (' + tweet_text_placeholders + ')'
 
 tweet_url_fields_list = ['tweet_id', 'user_id', 'progressive', 'url']
 tweet_url_fields = ', '.join(tweet_url_fields_list)
@@ -66,7 +66,7 @@ insert_tweets_urls_sql = 'INSERT INTO tweet_url (' + tweet_url_fields + ') VALUE
 tweet_hashtag_fields_list = ['tweet_id', 'user_id', 'hashtag_id']
 tweet_hashtag_fields = ', '.join(tweet_hashtag_fields_list)
 tweet_hashtag_placeholders = ', '.join(['%s']*len(tweet_hashtag_fields_list))
-insert_tweets_hashtags_sql = 'INSERT INTO tweet_hashtag (' + tweet_hashtag_fields + ') VALUES (' + tweet_hashtag_placeholders + ')'
+insert_tweets_hashtags_sql = 'REPLACE INTO tweet_hashtag (' + tweet_hashtag_fields + ') VALUES (' + tweet_hashtag_placeholders + ')'
 
 insert_hashtags_sql = 'INSERT INTO hashtag (hashtag) VALUES (%s) ON DUPLICATE KEY UPDATE hashtag=VALUES(hashtag)'
 
@@ -168,7 +168,7 @@ for tweet in iterator:
                         
         time_elapsed = time_elapsed + (time() - time_start)
         
-        if count > 1000 :
+        if count >= 2000 :
             total_time = time_elapsed 
             time_elapsed = time_elapsed /count
             logger.info("Downaloading time {0} - 1 tweet rate {1} ".format(total_time, time_elapsed))            
