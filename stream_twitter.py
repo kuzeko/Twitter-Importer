@@ -100,6 +100,7 @@ missing_users       = []
 count = 0
 total_inserted = 0
 time_elapsed = 0
+total_time = 0
 time_start = 0
 logger.info("Iterating through tweets")
 for tweet in iterator:
@@ -168,9 +169,9 @@ for tweet in iterator:
         time_elapsed = time_elapsed + (time() - time_start)
         
         if count > 1000 :
-                
+            total_time = time_elapsed 
             time_elapsed = time_elapsed /count
-            logger.info("Downaloading time rate {0} ".format(time_elapsed))            
+            logger.info("Downaloading time {0} - 1 tweet rate {1} ".format(total_time, time_elapsed))            
             
             if len(missing_users) > 0 :
                 missing_count = len(missing_users)
