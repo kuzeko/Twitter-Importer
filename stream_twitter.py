@@ -13,6 +13,7 @@ import HTMLParser
 from time import time
 from twitter import *
 from twitter_helper import data_parsers
+from twitter_helper import util as twitter_util
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger = logging.getLogger('user')
@@ -32,6 +33,7 @@ DB_USER             = config.get('DB_Config', 'db_user')
 DB_PASS             = config.get('DB_Config', 'db_password')
 CREDS_FILE          = config.get('Twitter_Config', 'twitter_creds')
 TWITTER_USERNAME    = config.get('Twitter_Config', 'username')
+TWITTER_LISTENER    = config.get('Twitter_Config', 'listener_username')
 CONSUMER_KEY        = config.get('Twitter_Config', 'consumer_key')
 CONSUMER_SECRET     = config.get('Twitter_Config', 'consumer_secret')
 TWITTER_CREDS       = os.path.expanduser(CREDS_FILE)
@@ -39,15 +41,18 @@ TWITTER_CREDS       = os.path.expanduser(CREDS_FILE)
 #How many hashtags IDs to store in memory
 MAX_CACHING_ENTRIES = 10000
 
+#Try authentication!
 oauth_token, oauth_secret = read_token_file(TWITTER_CREDS)
 oauth = OAuth( oauth_token, oauth_secret,CONSUMER_KEY,  CONSUMER_SECRET)
 
-
+#Connection to the Database
 logger.info( "Trying to connect to" + DB_HOST +"...")
 conn = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME, charset='utf8' )
 cursor = conn.cursor()
 logger.info( "...done!")
 
+
+#Prepare queries
 tweet_fields_list = ['id', 'user_id', 'in_reply_to_status_id', 'in_reply_to_user_id', 'favorited', 'retweeted', 'retweet_count', 'lang', 'created_at']
 tweet_fields = ', '.join(tweet_fields_list)
 tweet_placeholders = ', '.join(['%s']*len(tweet_fields_list))
@@ -76,15 +81,29 @@ user_placeholders = ', '.join(['%s']*len(user_fields_list))
 insert_users_sql = 'REPLACE INTO user (' + user_fields + ') VALUES (' + user_placeholders + ') '
 
 
-
-
-
+#Connecting to Twitter
+logger.info( "Connecting to twitter API...")
+twitter = Twitter(auth=oauth)
 logger.info( "Connecting to the stream...")
 twitter_stream = TwitterStream(auth=oauth)
 iterator = twitter_stream.statuses.sample()
 logger.info("Got connection!")
 
-# Use the stream
+#This is just for fun
+logger.info( "Reading Hamlet, for real!")
+text_file  = open("./Hamlet.txt")
+
+#We update the application status and we notify the Listener account via DM
+logger.info( "Tweeting for starters!")
+line = twitter_util.prepare_quote(text_file)
+now = datetime.datetime.now()
+twitter.statuses.update(status=line)
+twitter.direct_messages.new(user=TWITTER_LISTENER, text=now.strftime("%Y-%m-%d %H:%M") + " started downloading tweets ")
+
+
+########## Use the stream ###############
+
+#Declarations
 tweets              = []
 tweet_record        = []
 tweet_texts         = []
@@ -95,13 +114,14 @@ inserted_hashtags   = {}
 users               = {}
 missing_users       = []
 
-
-
 count = 0
 total_inserted = 0
 time_elapsed = 0
 total_time = 0
 time_start = 0
+
+
+#Computation on the Stream
 logger.info("Iterating through tweets")
 for tweet in iterator:
     time_start = time()
@@ -215,6 +235,15 @@ for tweet in iterator:
                 total_inserted = total_inserted + count
                 logger.info("Inserted {0} tweets up to now ".format(total_inserted))                
 
+                if total_inserted % 100000 == 0 :
+                    logger.info( "Tweeting status!")
+                    line = twitter_util.prepare_quote(text_file)
+                    now = datetime.datetime.now()
+                    twitter.statuses.update(status=line)
+                    pv_msg = now.strftime("%Y-%m-%d %H:%M") + " Downloaded {0} tweets "
+                    twitter.direct_messages.new(user=TWITTER_LISTENER, text=pv_msg.format(total_inserted))
+                
+
                  
                 count = 0
                 time_elapsed = 0
@@ -225,7 +254,11 @@ for tweet in iterator:
                 logger.error(cursor._last_executed)
                 logger.error(e)
                 cursor.close()
-
+                
+                logger.info("Warn your master!")
+                now = datetime.datetime.now()
+                pv_msg = now.strftime("%Y-%m-%d %H:%M") + "Application is shuttin down after {0} tweets!"
+                twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
                 break
     #else :
     #    print "What's this!?"

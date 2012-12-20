@@ -8,15 +8,8 @@ import ConfigParser
 import MySQLdb
 
 from twitter import *
+from twitter_helper import util as twitter_util
 
-def random_line(afile):
-    line = next(afile)
-    for num, aline in enumerate(afile):
-        aline = aline.strip()
-        if (len(aline) < 10 or aline[0].islower() or len(aline) > 123) or random.randrange(num + 2):
-            continue
-        line = aline
-    return line
 
 
 config = ConfigParser.ConfigParser()
@@ -35,19 +28,13 @@ oauth = OAuth( oauth_token, oauth_secret,CONSUMER_KEY,  CONSUMER_SECRET)
 twitter = Twitter(auth=oauth)
 
 text_file  = open("./Hamlet.txt")
-line = random_line(text_file)
-#print line
 
 now = datetime.datetime.now()
 print now.strftime("%Y-%m-%d %H:%M")
 
-number = random.randrange(1,1000,2)
-print number
-
-line = "%d] " + line
-line = line % number
+line = twitter_util.prepare_quote(text_file)
 print line
 
-twitter.statuses.update(status=line + " -- Hamlet")
+twitter.statuses.update(status=line)
 print "-------"
-twitter.direct_messages.new(user="kuzeko",text="I think yer swell!")
+twitter.direct_messages.new(user="kuzeko",text=now.strftime("%Y-%m-%d %H:%M") + " tweeting reached ")
