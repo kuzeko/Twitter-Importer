@@ -8,6 +8,7 @@ import datetime
 import dateutil.parser as parser
 import ConfigParser
 import MySQLdb
+import HTMLParser
 from time import time
 
 from twitter import *
@@ -22,7 +23,7 @@ config = ConfigParser.ConfigParser()
 file = config.read('config/twitter_config.cfg')
 
 highpoints = re.compile(u'[\U00010000-\U0010ffff]')
-
+html_parser = HTMLParser.HTMLParser()
 
 DB_HOST             = config.get('DB_Config', 'db_host')
 DB_NAME             = config.get('DB_Config', 'db_name')
@@ -132,6 +133,7 @@ for tweet in iterator:
             elif field == 'text' :
                 value = tweet['text'].strip()
                 value = highpoints.sub(u'', value)
+                value = html_parser.unescape(value)
                 tweet_text_record.append(value)
             elif field == 'geo_lat' :
                 if tweet['geo'] != None:
@@ -176,6 +178,7 @@ for tweet in iterator:
             elif field == 'description' :
                 value = user_data['description'].strip()
                 value = highpoints.sub(u'', value)
+                value = html_parser.unescape(value)
                 user_record.append(value)
             elif field == 'utc_offset' :
                 if user_data['utc_offset'] == None or  user_data['utc_offset'] == '':
