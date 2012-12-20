@@ -214,8 +214,8 @@ for tweet in iterator:
                                 #Again
                                 if hash_id == None or hash_id == 0 :                            
                                     raise Exception("hash_id is {0} for {1} ".format(hash_id, hash_text) )
-                            else :
-                                logger.info("Found  {0} in the databse with id {1} ".format(hash_text, hash_id))
+                            #else :
+                            #    logger.info("Found  {0} in the databse with id {1} ".format(hash_text, hash_id.encode("ascii", "xmlcharrefreplace")))
                                                             
                             inserted_hashtags[hash_text] = hash_id                             
                         else :
