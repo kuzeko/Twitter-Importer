@@ -238,12 +238,15 @@ for tweet in iterator:
         time_elapsed = time_elapsed + (time() - time_start)
         
         if count > 1000 :
-            try:
-                logger.info("Inserting {0} tweets ".format(len(tweets)))
-                cursor.executemany(insert_tweets_sql, tweets)
                 
-                logger.info("Inserting {0} tweet texts ".format(len(tweet_texts)))
-                cursor.executemany(insert_tweets_texts_sql, tweet_texts)
+            time_elapsed = time_elapsed /count
+            logger.info("Downaloading time rate {0} ".format(time_elapsed))            
+            
+            try:
+                logger.info("Inserting {0} tweets and {1} texts ".format(len(tweets), len(tweet_texts)))
+                time_start = time()
+                cursor.executemany(insert_tweets_sql, tweets)            
+                cursor.executemany(insert_tweets_texts_sql, tweet_texts)                
                 
                 logger.info("Inserting {0} tweet urls ".format(len(urls)))
                 cursor.executemany(insert_tweets_urls_sql, urls)
@@ -258,6 +261,9 @@ for tweet in iterator:
                 logger.info("Commit..")
                 conn.commit()
                 
+                time_elapsed = (time() - time_start)
+                logger.info("Queries executed in {0} seconds ".format(time_elapsed))
+                
                 tweets              = []
                 tweet_texts         = []
                 urls                = []
@@ -267,10 +273,9 @@ for tweet in iterator:
                 if len(inserted_hashtags) > MAX_CACHING_ENTRIES :
                     inserted_hashtags = {}                                                    
 
-                total_inserted = total_inserted + count                
-                time_elapsed = time_elapsed /count
+                total_inserted = total_inserted + count
                 logger.info("Inserted {0} tweets up to now ".format(total_inserted))                
-                logger.info("Inserting time ration {0} ".format(time_elapsed))
+
                  
                 count = 0
                 time_elapsed = 0
