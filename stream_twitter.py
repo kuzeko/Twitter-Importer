@@ -12,7 +12,7 @@ import HTMLParser
 
 from time import time
 from twitter import *
-from twitter_helper import *
+from twitter_helper import data_parsers
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger = logging.getLogger('user')
@@ -112,15 +112,15 @@ for tweet in iterator:
         user_data = tweet['user']
         user_id = user_data['id']
 
-        tweet_record = parse_tweet_basic_infos(tweet, tweet_fields_list)        
+        tweet_record = data_parsers.parse_tweet_basic_infos(tweet, tweet_fields_list)        
         tweets.append(tweet_record)
 
-        tweet_text_record = parse_tweet_text_infos(tweet, tweet_text_fields_list )
+        tweet_text_record = data_parsers.parse_tweet_text_infos(tweet, tweet_text_fields_list )
         tweet_texts.append(tweet_text_record)
 
 
         user_record = []
-        user_record = parse_user_infos(user_data, user_fields_list)
+        user_record = data_parsers.parse_user_infos(user_data, user_fields_list)
         if user_record == None :
             missing_users.append(user_id)
         else :
