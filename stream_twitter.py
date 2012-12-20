@@ -104,7 +104,7 @@ time_start = 0
 logger.info("Iterating through tweets")
 for tweet in iterator:
     time_start = time()
-    if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
+    if ('text' in tweet and 'lang' in tweet) and (tweet['lang'] == 'en' and  tweet['text'] != None ) :
 
         tweet_record = []
         tweet_text_record   = []
