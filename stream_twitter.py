@@ -8,6 +8,7 @@ import datetime
 import dateutil.parser as parser
 import ConfigParser
 import MySQLdb
+from time import time
 
 from twitter import *
 
@@ -95,9 +96,11 @@ users               = {}
 
 count = 0
 total_inserted = 0
-
+time_elapsed = 0
+time_start = 0
 logger.info("Iterating through tweets")
 for tweet in iterator:
+    time_start = time()
     if 'text' in tweet  and  tweet['text'] != None and tweet['lang'] == 'en' :
 
         tweet_record = []
@@ -179,6 +182,9 @@ for tweet in iterator:
                     user_record.append(0)
                 else :
                     user_record.append(user_data['utc_offset'])
+            elif field == 'url' :
+                value = user_data['url'][:159]                
+                user_record.append(value)                                    
             elif field in user_data :
                 if user_data[field] == None :
                     value = ''
@@ -190,6 +196,7 @@ for tweet in iterator:
         #To avoid duplicates
         tweet_hashtags_register = []
         count = count + 1
+        
         if len(tweet['entities']) >0 :
             if len(tweet['entities']['urls']) > 0  :
                 url_count = 0
@@ -224,7 +231,9 @@ for tweet in iterator:
                         
                         hashtags.append([tweet['id'], user_id, hash_id ])
                         tweet_hashtags_register.append(hash_text)
-
+                        
+        time_elapsed = time_elapsed + (time() - time_start)
+        
         if count > 1000 :
             try:
                 logger.info("Inserting {0} tweets ".format(len(tweets)))
@@ -253,15 +262,16 @@ for tweet in iterator:
                 users               = {}
 
                 if len(inserted_hashtags) > MAX_CACHING_ENTRIES :
-                    inserted_hashtags = {}
-                    
-                  
-                
+                    inserted_hashtags = {}                                                    
 
-                total_inserted = total_inserted + count
-                count = 0
+                total_inserted = total_inserted + count                
+                time_elapsed = time_elapsed /count
                 logger.info("Inserted {0} tweets up to now ".format(total_inserted))                
-
+                logger.info("Inserting time ration {0} ".format(time_elapsed))
+                 
+                count = 0
+                time_elapsed = 0
+                
             except Exception as e:
                 conn.rollback()                
                 logger.error("An error occurred while exectuing the query:")
