@@ -177,9 +177,8 @@ for tweet in iterator:
                 for user_id in missing_users :
                     if user_id not in users :
                         missing_count = missing_count - 1                    
-                logger.info("Missing {0} users ".format(missing_count)
+                logger.info("Missing {0} users ".format(missing_count))
                 
-
             
             try:
                 #logger.info("Inserting {0} tweets and {1} texts ".format(len(tweets), len(tweet_texts)))
