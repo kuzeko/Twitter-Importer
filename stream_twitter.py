@@ -202,6 +202,7 @@ for tweet in iterator:
                 for hash in tweet['entities']['hashtags'] :
                     hash_id = 0                    
                     hash_text = highpoints.sub(u'', hash['text'])
+                    hash_text = hash_text.lower()
                     if hash_text not in tweet_hashtags_register :
                         if not hash_text in inserted_hashtags :
                             cursor.execute(insert_hashtags_sql, [hash_text])
