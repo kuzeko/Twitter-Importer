@@ -26,7 +26,7 @@ twitter = Twitter(auth=oauth)
 #773907288
 user_id = 'mfahmy123'
 
-u = twitter._(user_id)
+u = twitter.users.lookup(screen_name=user_id)
 
 print "-------"
 print u
