@@ -68,7 +68,7 @@ insert_hashtags_sql = 'INSERT INTO hashtag (hashtag) VALUES (%s) ON DUPLICATE KE
 user_fields_list = ['id', 'screen_name', 'name', 'verified', 'protected', 'followers_count', 'friends_count', 'statuses_count', 'favourites_count', 'location', 'utc_offset', 'time_zone', 'geo_enabled', 'lang', 'description', 'url', 'created_at']
 user_fields = ', '.join(user_fields_list)
 user_placeholders = ', '.join(['%s']*len(user_fields_list))
-insert_users_sql = 'INSERT INTO user (' + user_fields + ') VALUES (' + user_placeholders + ')'
+insert_users_sql = 'REPLACE INTO user (' + user_fields + ') VALUES (' + user_placeholders + ') '
 
 
 
@@ -88,6 +88,7 @@ urls                = []
 hashtags            = []
 inserted_hashtags   = {}
 users               = {}
+
 
 
 count = 0
