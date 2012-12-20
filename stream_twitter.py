@@ -9,7 +9,6 @@ import dateutil.parser as parser
 import ConfigParser
 import MySQLdb
 
-
 from twitter import *
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
@@ -33,6 +32,9 @@ TWITTER_USERNAME    = config.get('Twitter_Config', 'username')
 CONSUMER_KEY        = config.get('Twitter_Config', 'consumer_key')
 CONSUMER_SECRET     = config.get('Twitter_Config', 'consumer_secret')
 TWITTER_CREDS       = os.path.expanduser(CREDS_FILE)
+
+#How many hashtags IDs to store in memory
+MAX_CACHING_ENTRIES = 10000
 
 oauth_token, oauth_secret = read_token_file(TWITTER_CREDS)
 oauth = OAuth( oauth_token, oauth_secret,CONSUMER_KEY,  CONSUMER_SECRET)
@@ -203,16 +205,18 @@ for tweet in iterator:
                         if not hash['text'] in inserted_hashtags :
                             cursor.execute(insert_hashtags_sql, [hash['text']])
                             conn.commit()
-                            cursor_lastrowid = cursor.lastrowid                        
-                            inserted_hashtags[hash['text']] = hash_id =  cursor_lastrowid
+                            hash_id = cursor.lastrowid                                                    
                             
-                            if cursor_lastrowid == None or cursor_lastrowid == 0 :
-                                logger.info("Looking for  {0} in the databse ".format(hash['text']))
+                            if hash_id == None or hash_id == 0 :                                
                                 cursor.execute("SELECT id FROM hashtag h WHERE h.hashtag = %s", [hash['text']])
-                                inserted_hashtags[hash['text']] = hash_id = cursor.fetchone()[0]
-                                
-                            if hash_id == None or hash_id == 0 :                            
-                                raise Exception("hash_id is {0} for {1} ".format(hash_id, hash['text']) )
+                                hash_id = cursor.fetchone()[0]
+                                #Again
+                                if hash_id == None or hash_id == 0 :                            
+                                    raise Exception("hash_id is {0} for {1} ".format(hash_id, hash['text']) )
+                            else :
+                                logger.info("Found  {0} in the databse with id {1} ".format(hash['text'], hash_id))
+                                                            
+                            inserted_hashtags[hash['text']] = hash_id                             
                         else :
                             hash_id = inserted_hashtags[hash['text']]
                         
@@ -244,8 +248,13 @@ for tweet in iterator:
                 tweet_texts         = []
                 urls                = []
                 hashtags            = []
-                inserted_hashtags   = {}
                 users               = {}
+
+                if len(inserted_hashtags) > MAX_CACHING_ENTRIES :
+                    inserted_hashtags = {}
+                    
+                  
+                
 
                 total_inserted = total_inserted + count
                 count = 0
