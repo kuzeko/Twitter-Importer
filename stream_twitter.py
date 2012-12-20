@@ -201,27 +201,28 @@ for tweet in iterator:
             if len(tweet['entities']['hashtags']) > 0  :
                 for hash in tweet['entities']['hashtags'] :
                     hash_id = 0                    
-                    if hash['text'] not in tweet_hashtags_register :
-                        if not hash['text'] in inserted_hashtags :
-                            cursor.execute(insert_hashtags_sql, [hash['text']])
+                    hash_text = highpoints.sub(u'', hash['text'])
+                    if hash_text not in tweet_hashtags_register :
+                        if not hash_text in inserted_hashtags :
+                            cursor.execute(insert_hashtags_sql, [hash_text])
                             conn.commit()
                             hash_id = cursor.lastrowid                                                    
                             
                             if hash_id == None or hash_id == 0 :                                
-                                cursor.execute("SELECT id FROM hashtag h WHERE h.hashtag = %s", [hash['text']])
+                                cursor.execute("SELECT id FROM hashtag h WHERE h.hashtag = %s", [hash_text])
                                 hash_id = cursor.fetchone()[0]
                                 #Again
                                 if hash_id == None or hash_id == 0 :                            
-                                    raise Exception("hash_id is {0} for {1} ".format(hash_id, hash['text']) )
+                                    raise Exception("hash_id is {0} for {1} ".format(hash_id, hash_text) )
                             else :
-                                logger.info("Found  {0} in the databse with id {1} ".format(hash['text'], hash_id))
+                                logger.info("Found  {0} in the databse with id {1} ".format(hash_text, hash_id))
                                                             
-                            inserted_hashtags[hash['text']] = hash_id                             
+                            inserted_hashtags[hash_text] = hash_id                             
                         else :
-                            hash_id = inserted_hashtags[hash['text']]
+                            hash_id = inserted_hashtags[hash_text]
                         
                         hashtags.append([tweet['id'], user_id, hash_id ])
-                        tweet_hashtags_register.append(hash['text'])
+                        tweet_hashtags_register.append(hash_text)
 
         if count > 1000 :
             try:
