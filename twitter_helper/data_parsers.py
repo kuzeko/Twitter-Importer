@@ -88,16 +88,6 @@ def parse_user_infos(user_data, user_fields_list ):
         elif field == 'lang' :    
             value = user_data['lang'][:2]                
             user_record.append(value)
-        elif field == 'description' :
-            value = user_data['description'].strip()
-            value = highpoints.sub(u'', value)
-            value = html_parser.unescape(value)
-            user_record.append(value)
-        elif field == 'name' :
-            value = user_data['name'].strip()
-            value = highpoints.sub(u'', value)
-            value = html_parser.unescape(value)
-            user_record.append(value)
         elif field == 'utc_offset' :
             if user_data['utc_offset'] == None or  user_data['utc_offset'] == '':
                 user_record.append(0)
@@ -106,11 +96,16 @@ def parse_user_infos(user_data, user_fields_list ):
         elif field == 'url' :
             value = user_data['url'][:159]                
             user_record.append(value)
-        elif field == 'followers_count' or field == 'friends_count' or field == 'statuses_count'  or field == 'favourites_count' :
+        elif field in ['description', 'name', 'location'] :
+            value = user_data[field].strip()
+            value = highpoints.sub(u'', value)
+            value = html_parser.unescape(value)
+            user_record.append(value)
+        elif field in ['followers_count', 'friends_count', 'statuses_count', 'favourites_count'] :
             value = user_data[field]
             if value < 0 :
                 return None
-            user_record.append(value)
+            user_record.append(value)            
         elif field in user_data :
             if user_data[field] == None :
                 value = ''
