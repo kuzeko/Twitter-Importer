@@ -37,8 +37,8 @@ TWITTER_USERNAME    = config.get('Twitter_Config', 'username')
 TWITTER_LISTENER    = config.get('Twitter_Config', 'listener_username')
 CONSUMER_KEY        = config.get('Twitter_Config', 'consumer_key')
 CONSUMER_SECRET     = config.get('Twitter_Config', 'consumer_secret')
-WRITE_RATE          = config.get('Twitter_Config', 'write_rate')
-WARN_RATE           = config.get('Twitter_Config', 'warn_rate')
+WRITE_RATE          = config.getint('Twitter_Config', 'write_rate')
+WARN_RATE           = config.getint('Twitter_Config', 'warn_rate')
 
 TWITTER_CREDS       = os.path.expanduser(CREDS_FILE)
 
@@ -265,8 +265,8 @@ for tweet in iterator:
                 
                 
                 file = config.read('config/twitter_config.cfg')
-                WRITE_RATE_TMP = config.get('Twitter_Config', 'write_rate')
-                WARN_RATE_TMP = config.get('Twitter_Config', 'warn_rate')
+                WRITE_RATE_TMP = config.getint('Twitter_Config', 'write_rate')
+                WARN_RATE_TMP = config.getint('Twitter_Config', 'warn_rate')
                 if WRITE_RATE != WARN_RATE_TMP :
                     logger.info("WRITE RATE changed from {0} to {1} ".format(WRITE_RATE, WRITE_RATE_TMP))
                     WRITE_RATE = WRITE_RATE_TMP
