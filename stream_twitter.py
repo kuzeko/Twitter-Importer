@@ -14,6 +14,7 @@ from time import time
 from twitter import *
 from twitter_helper import data_parsers
 from twitter_helper import util as twitter_util
+from compiler.ast import Break
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger = logging.getLogger('user')
@@ -199,8 +200,7 @@ for tweet in iterator:
                     if user_id not in users :
                         missing_count = missing_count - 1                    
                 logger.info("Missing {0} users ".format(missing_count))
-                
-            
+                            
             try:
                 #logger.info("Inserting {0} tweets and {1} texts ".format(len(tweets), len(tweet_texts)))
                 time_start = time()
@@ -219,7 +219,20 @@ for tweet in iterator:
                 
                 logger.info("Commit..")
                 conn.commit()
+                                            
+            except Exception as e:
+                conn.rollback()                
+                logger.error("An error occurred while exectuing the query:")
+                logger.error(cursor._last_executed)
+                logger.error(e)
+                cursor.close()
                 
+                logger.info("Warn your master!")
+                now = datetime.datetime.now()
+                pv_msg = now.strftime("%Y-%m-%d %H:%M") + "ERROR: Application is shuttin down after {0} tweets!"
+                twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
+                break
+            else :
                 time_elapsed = (time() - time_start)
                 logger.info("Queries executed in {0} seconds ".format(time_elapsed))
                 
@@ -242,24 +255,11 @@ for tweet in iterator:
                     twitter.statuses.update(status=line)
                     pv_msg = now.strftime("%Y-%m-%d %H:%M") + " Downloaded {0} tweets "
                     twitter.direct_messages.new(user=TWITTER_LISTENER, text=pv_msg.format(total_inserted))
-                
-
-                 
+                             
                 count = 0
                 time_elapsed = 0
                 
-            except Exception as e:
-                conn.rollback()                
-                logger.error("An error occurred while exectuing the query:")
-                logger.error(cursor._last_executed)
-                logger.error(e)
-                cursor.close()
                 
-                logger.info("Warn your master!")
-                now = datetime.datetime.now()
-                pv_msg = now.strftime("%Y-%m-%d %H:%M") + "ERROR: Application is shuttin down after {0} tweets!"
-                twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
-                break
     #else :
     #    print "What's this!?"
     #    print tweet
