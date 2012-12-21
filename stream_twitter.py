@@ -265,8 +265,16 @@ for tweet in iterator:
                 
                 
                 file = config.read('config/twitter_config.cfg')
-                WRITE_RATE = config.get('Twitter_Config', 'write_rate')
-                WARN_RATE = config.get('Twitter_Config', 'warn_rate')
+                WRITE_RATE_TMP = config.get('Twitter_Config', 'write_rate')
+                WARN_RATE_TMP = config.get('Twitter_Config', 'warn_rate')
+                if WRITE_RATE != WARN_RATE_TMP :
+                    logger.info("WRITE RATE changed from {0} to {1} ".format(WRITE_RATE, WRITE_RATE_TMP))
+                    WRITE_RATE = WRITE_RATE_TMP
+                if WARN_RATE != WARN_RATE_TMP :
+                    logger.info("WARN RATE changed from {0} to {1} ".format(WARN_RATE, WARN_RATE_TMP))
+                    WARN_RATE = WARN_RATE_TMP
+                
+                
                                             
     #else :
     #    print "What's this!?"
