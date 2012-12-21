@@ -235,7 +235,7 @@ for tweet in iterator:
                 total_inserted = total_inserted + count
                 logger.info("Inserted {0} tweets up to now ".format(total_inserted))                
 
-                if total_inserted % 100000 == 0 :
+                if total_inserted % 2000 == 0 :
                     logger.info( "Tweeting status!")
                     line = twitter_util.prepare_quote(text_file)
                     now = datetime.datetime.now()
@@ -257,7 +257,7 @@ for tweet in iterator:
                 
                 logger.info("Warn your master!")
                 now = datetime.datetime.now()
-                pv_msg = now.strftime("%Y-%m-%d %H:%M") + "Application is shuttin down after {0} tweets!"
+                pv_msg = now.strftime("%Y-%m-%d %H:%M") + "ERROR: Application is shuttin down after {0} tweets!"
                 twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
                 break
     #else :
