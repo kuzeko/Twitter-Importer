@@ -233,7 +233,8 @@ for tweet in iterator:
                 
                 logger.info("Warn your master!")
                 now = datetime.datetime.now()
-                error_message = "ERROR: " + type(e) + " - "
+                error_type = "{0}]".format(type(e))
+                error_message = "[ERROR: " + error_type + " "
                 pv_msg = now.strftime("%Y-%m-%d %H:%M") + error_message + "Application is shuttin down after {0} tweets!"
                 twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
                 break
