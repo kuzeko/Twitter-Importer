@@ -7,6 +7,8 @@ def random_line(afile, max_chars = 123, min_chars = 5):
         if (len(aline) < min_chars or aline[0].islower() or len(aline) > max_chars) or random.randrange(num + 2):
             continue
         line = aline
+    #Be polite, put things back in the place you found them
+    afile.seek(0)
     return line
 
 def prepare_quote(text_file, signature=" -- Hamlet", max_chars = 123, min_chars = 5,):
