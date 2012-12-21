@@ -127,6 +127,7 @@ time_start = 0
 
 #Computation on the Stream
 logger.info("Iterating through tweets")
+logger.info( "Warn rate is {0} , write rate is {1}".format(WARN_RATE, WRITE_RATE))
 for tweet in iterator:
     time_start = time()
     if ('text' in tweet and 'lang' in tweet) and (tweet['lang'] == 'en' and  tweet['text'] != None ) :
@@ -267,7 +268,7 @@ for tweet in iterator:
                 file = config.read('config/twitter_config.cfg')
                 WRITE_RATE_TMP = config.getint('Twitter_Config', 'write_rate')
                 WARN_RATE_TMP = config.getint('Twitter_Config', 'warn_rate')
-                if WRITE_RATE != WARN_RATE_TMP :
+                if WRITE_RATE != WRITE_RATE_TMP :
                     logger.info("WRITE RATE changed from {0} to {1} ".format(WRITE_RATE, WRITE_RATE_TMP))
                     WRITE_RATE = WRITE_RATE_TMP
                 if WARN_RATE != WARN_RATE_TMP :
