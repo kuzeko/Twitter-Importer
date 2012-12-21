@@ -37,6 +37,9 @@ TWITTER_USERNAME    = config.get('Twitter_Config', 'username')
 TWITTER_LISTENER    = config.get('Twitter_Config', 'listener_username')
 CONSUMER_KEY        = config.get('Twitter_Config', 'consumer_key')
 CONSUMER_SECRET     = config.get('Twitter_Config', 'consumer_secret')
+WRITE_RATE          = config.get('Twitter_Config', 'write_rate')
+WARN_RATE           = config.get('Twitter_Config', 'warn_rate')
+
 TWITTER_CREDS       = os.path.expanduser(CREDS_FILE)
 
 #How many hashtags IDs to store in memory
@@ -189,10 +192,10 @@ for tweet in iterator:
                         
         time_elapsed = time_elapsed + (time() - time_start)
         
-        if count >= 2000 :
+        if count >= WRITE_RATE :
             total_time = time_elapsed 
             time_elapsed = time_elapsed /count
-            logger.info("Downaloading time {0} - 1 tweet rate {1} ".format(total_time, time_elapsed))            
+            logger.info("Downloading time {0} - 1 tweet rate {1} ".format(total_time, time_elapsed))            
             
             if len(missing_users) > 0 :
                 missing_count = len(missing_users)
@@ -229,7 +232,8 @@ for tweet in iterator:
                 
                 logger.info("Warn your master!")
                 now = datetime.datetime.now()
-                pv_msg = now.strftime("%Y-%m-%d %H:%M") + "ERROR: Application is shuttin down after {0} tweets!"
+                error_message = "ERROR: " + type(e) + " - "
+                pv_msg = now.strftime("%Y-%m-%d %H:%M") + error_message + "Application is shuttin down after {0} tweets!"
                 twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
                 break
             else :
@@ -248,7 +252,7 @@ for tweet in iterator:
                 total_inserted = total_inserted + count
                 logger.info("Inserted {0} tweets up to now ".format(total_inserted))                
 
-                if total_inserted % 2000 == 0 :
+                if total_inserted % WARN_RATE == 0 :
                     logger.info( "Tweeting status!")
                     line = twitter_util.prepare_quote(text_file)
                     now = datetime.datetime.now()
@@ -260,6 +264,10 @@ for tweet in iterator:
                 time_elapsed = 0
                 
                 
+                file = config.read('config/twitter_config.cfg')
+                WRITE_RATE = config.get('Twitter_Config', 'write_rate')
+                WARN_RATE = config.get('Twitter_Config', 'warn_rate')
+                                            
     #else :
     #    print "What's this!?"
     #    print tweet
