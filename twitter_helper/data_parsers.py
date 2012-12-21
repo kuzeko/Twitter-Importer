@@ -93,6 +93,11 @@ def parse_user_infos(user_data, user_fields_list ):
             value = highpoints.sub(u'', value)
             value = html_parser.unescape(value)
             user_record.append(value)
+        elif field == 'name' :
+            value = user_data['name'].strip()
+            value = highpoints.sub(u'', value)
+            value = html_parser.unescape(value)
+            user_record.append(value)
         elif field == 'utc_offset' :
             if user_data['utc_offset'] == None or  user_data['utc_offset'] == '':
                 user_record.append(0)
