@@ -203,8 +203,8 @@ for tweet in iterator:
         
         if count >= WRITE_RATE :
             total_time = time_elapsed 
-            time_elapsed = time_elapsed /count
-            logger.info("Downloading time {0} - 1 tweet rate {1} ".format(total_time, time_elapsed))            
+            time_elapsed = (time_elapsed*1000) /count
+            logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.2f} millis ".format(total_time, time_elapsed))            
             
             if len(missing_users) > 0 :
                 missing_count = len(missing_users)
@@ -267,7 +267,7 @@ for tweet in iterator:
                     line = twitter_util.prepare_quote(text_file)
                     now = datetime.datetime.now()
                     twitter.statuses.update(status=line)                   
-                    pv_msg = now.strftime("%Y-%m-%d %H:%M") + " Downloaded {0} tweets after {1} minutes"
+                    pv_msg = now.strftime("%Y-%m-%d %H:%M") + " Downloaded {0} tweets after {1:.4f} minutes"
                     minutes = (time()-last_time_notified)/60
                     twitter.direct_messages.new(user=TWITTER_LISTENER, text=pv_msg.format(total_inserted, minutes))
                     last_time_notified = time()
