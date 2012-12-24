@@ -26,6 +26,8 @@ config = ConfigParser.ConfigParser()
 file = config.read('config/twitter_config.cfg')
 
 highpoints = re.compile(u'[\U00010000-\U0010ffff]')
+alphanum = re.compile(u'^[\w]+$')
+
 html_parser = HTMLParser.HTMLParser()
 
 DB_HOST             = config.get('DB_Config', 'db_host')
@@ -77,7 +79,7 @@ tweet_hashtag_fields = ', '.join(tweet_hashtag_fields_list)
 tweet_hashtag_placeholders = ', '.join(['%s']*len(tweet_hashtag_fields_list))
 insert_tweets_hashtags_sql = 'REPLACE INTO tweet_hashtag (' + tweet_hashtag_fields + ') VALUES (' + tweet_hashtag_placeholders + ')'
 
-insert_hashtags_sql = 'INSERT INTO hashtag (hashtag) VALUES (%s) ON DUPLICATE KEY UPDATE hashtag=VALUES(hashtag)'
+insert_hashtags_sql = 'INSERT INTO hashtag (hashtag, partitioning_value) VALUES (%s, %s) ON DUPLICATE KEY UPDATE hashtag=VALUES(hashtag), partitioning_value=VALUES(partitioning_value)'
 
 user_fields_list = ['id', 'screen_name', 'name', 'verified', 'protected', 'followers_count', 'friends_count', 'statuses_count', 'favourites_count', 'location', 'utc_offset', 'time_zone', 'geo_enabled', 'lang', 'description', 'url', 'created_at']
 user_fields = ', '.join(user_fields_list)
@@ -96,13 +98,6 @@ logger.info("Got connection!")
 #This is just for fun
 logger.info( "Reading Hamlet, for real!")
 text_file  = open("./Hamlet.txt")
-
-#We update the application status and we notify the Listener account via DM
-logger.info( "Tweeting for starters!")
-line = twitter_util.prepare_quote(text_file)
-now = datetime.datetime.now()
-twitter.statuses.update(status=line)
-twitter.direct_messages.new(user=TWITTER_LISTENER, text=now.strftime("%Y-%m-%d %H:%M") + " started downloading tweets ")
 
 
 ########## Use the stream ###############
@@ -123,6 +118,16 @@ total_inserted = 0
 time_elapsed = 0
 total_time = 0
 time_start = 0
+last_time_notified = 0
+
+
+#We update the application status and we notify the Listener account via DM
+logger.info( "Tweeting for starters!")
+line = twitter_util.prepare_quote(text_file)
+now = datetime.datetime.now()
+twitter.statuses.update(status=line)
+twitter.direct_messages.new(user=TWITTER_LISTENER, text=now.strftime("%Y-%m-%d %H:%M") + " started downloading tweets ")
+last_time_notified = time()
 
 
 #Computation on the Stream
@@ -167,16 +172,19 @@ for tweet in iterator:
             if len(tweet['entities']['hashtags']) > 0  :
                 for hash in tweet['entities']['hashtags'] :
                     hash_id = 0                    
-                    hash_text = highpoints.sub(u'', hash['text'])
+                    hash_text = highpoints.sub(u'', hash['text'])                    
                     hash_text = hash_text.lower()
-                    if hash_text not in tweet_hashtags_register :
+                    valid_hashtag = alphanum.match(hash_text)
+                    if valid_hashtag and hash_text not in tweet_hashtags_register :
+                        partition = ord(hash_text[0])
                         if not hash_text in inserted_hashtags :
-                            cursor.execute(insert_hashtags_sql, [hash_text])
+                            cursor.execute(insert_hashtags_sql, [hash_text, partition])
                             conn.commit()
                             hash_id = cursor.lastrowid                                                    
                             
                             if hash_id == None or hash_id == 0 :                                
-                                cursor.execute("SELECT id FROM hashtag h WHERE h.hashtag = %s", [hash_text])
+                                #Order is inverted as MySQL is not so good in deciding wich check do first 
+                                cursor.execute("SELECT id FROM hashtag h WHERE h.partitioning_value =%s AND h.hashtag = %s", [partition, hash_text])
                                 hash_id = cursor.fetchone()[0]
                                 #Again
                                 if hash_id == None or hash_id == 0 :                            
@@ -258,9 +266,11 @@ for tweet in iterator:
                     logger.info( "Tweeting status!")
                     line = twitter_util.prepare_quote(text_file)
                     now = datetime.datetime.now()
-                    twitter.statuses.update(status=line)
-                    pv_msg = now.strftime("%Y-%m-%d %H:%M") + " Downloaded {0} tweets "
-                    twitter.direct_messages.new(user=TWITTER_LISTENER, text=pv_msg.format(total_inserted))
+                    twitter.statuses.update(status=line)                   
+                    pv_msg = now.strftime("%Y-%m-%d %H:%M") + " Downloaded {0} tweets after {1} minutes"
+                    minutes = (time()-last_time_notified)/60
+                    twitter.direct_messages.new(user=TWITTER_LISTENER, text=pv_msg.format(total_inserted, minutes))
+                    last_time_notified = time()
                              
                 count = 0
                 time_elapsed = 0

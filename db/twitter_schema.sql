@@ -70,7 +70,10 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`user` (
   `url` VARCHAR(160) NULL ,
   `created_at` DATETIME NOT NULL ,
   PRIMARY KEY (`id`) )
-ENGINE = MyISAM;
+ENGINE = MyISAM
+PARTITION BY HASH( `id` )
+PARTITIONS 6;
+
 
 CREATE INDEX `LANG` ON `twitter`.`user` (`lang` ASC) ;
 
@@ -96,10 +99,14 @@ DROP TABLE IF EXISTS `twitter`.`hashtag` ;
 CREATE  TABLE IF NOT EXISTS `twitter`.`hashtag` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT ,
   `hashtag` VARCHAR(160) NOT NULL ,
-  PRIMARY KEY (`id`) )
-ENGINE = MyISAM;
+  `partitioning_value` SMALLINT UNSIGNED NOT NULL DEFAULT 0 ,
+  PRIMARY KEY (`id`, `partitioning_value`) )
+ENGINE = MyISAM
+PARTITION BY HASH( `partitioning_value` )
+PARTITIONS 6;
 
-CREATE UNIQUE INDEX `hashtag_UNIQUE` ON `twitter`.`hashtag` (`hashtag` ASC) ;
+
+CREATE UNIQUE INDEX `UNIQUE` ON `twitter`.`hashtag` (`hashtag` ASC, `partitioning_value` ASC) ;
 
 
 -- -----------------------------------------------------
