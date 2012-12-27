@@ -41,11 +41,13 @@ CONSUMER_KEY        = config.get('Twitter_Config', 'consumer_key')
 CONSUMER_SECRET     = config.get('Twitter_Config', 'consumer_secret')
 WRITE_RATE          = config.getint('Twitter_Config', 'write_rate')
 WARN_RATE           = config.getint('Twitter_Config', 'warn_rate')
+#How many hashtags IDs to store in memory
+MAX_CACHING_ENTRIES  = config.getint('Twitter_Config', 'max_caching_entries')
 
 TWITTER_CREDS       = os.path.expanduser(CREDS_FILE)
 
-#How many hashtags IDs to store in memory
-MAX_CACHING_ENTRIES = 10000
+
+
 
 #Try authentication!
 oauth_token, oauth_secret = read_token_file(TWITTER_CREDS)
