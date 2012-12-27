@@ -10,11 +10,14 @@ import ConfigParser
 import MySQLdb
 import HTMLParser
 
+
 from time import time
+from collections import deque
 from twitter import *
 from twitter_helper import data_parsers
 from twitter_helper import util as twitter_util
-from compiler.ast import Break
+from cgi import maxlen
+
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
 logger = logging.getLogger('user')
@@ -112,6 +115,7 @@ tweet_text_record   = []
 urls                = []
 hashtags            = []
 inserted_hashtags   = {}
+hashtag_buffer      = deque(maxlen=MAX_CACHING_ENTRIES)
 users               = {}
 missing_users       = []
 
@@ -194,7 +198,15 @@ for tweet in iterator:
                             #else :
                             #    logger.info("Found  {0} in the databse with id {1} ".format(hash_text, hash_id.encode("ascii", "xmlcharrefreplace")))
                                                             
-                            inserted_hashtags[hash_text] = hash_id                             
+                            
+                            
+                            if len(hashtag_buffer) >= MAX_CACHING_ENTRIES :
+                                to_remove = hashtag_buffer.popleft()
+                                del inserted_hashtags[to_remove]
+                                
+                            hashtag_buffer.append(hash_text)
+                            inserted_hashtags[hash_text] = hash_id
+                                                         
                         else :
                             hash_id = inserted_hashtags[hash_text]
                         
