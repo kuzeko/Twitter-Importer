@@ -33,7 +33,7 @@ Keep them secret!
 
 ## Configuration
 
-The configuration files is organized as follows:
+The configuration file is organized as follows:
 
 The first section contans the authentication parameters to the database, where tweets and data relative to them are stored.
  
