@@ -17,7 +17,7 @@ Then edit the file
 
     config/twitter_config.cfg
 
-Currently it contains a little script to materialise Twitter OAuth credentials, it is:
+Currently the project contains a little script to materialise Twitter OAuth credentials, it is:
 
     oauth_dance.py
 
@@ -30,6 +30,39 @@ Performing the "oauth dance" gets you an ouath token and oauth secret that authe
 This process should save these for later so that the user doesn't have to do the oauth dance again.
 
 Keep them secret!
+
+## Configuration
+
+The configuration files is organized as follows:
+
+The first section contans the authentication parameters to the database, where tweets and data relative to them are stored.
+ 
+    [DB_Config]
+    db_host = localhost
+    db_name = twitter
+    db_user = username
+    db_password = th3p4$$w0rd
+    
+
+The secon section instead contains the path to the configuration directory, relative to the root of the project.
+The name of the file where the OAuth credentials are stored.
+The username of the twitter account under which the application is running.
+The Twitter username to which the application will send a Direct Message once the number of tweets declared into `warn_rate` tweets have been downloaded.
+You want this to notify you that the application is still running and to be updated on its actual performances.    
+Consumer secret and Consumer keys are required for the OAuth authentication.
+`write_rate` specifies the number of tweets to download before writing them to the database.
+`max_caching_entries` refers to the number of hashtags IDs to keep in memory, it is needed to limit the number of query to the database when we need to store for each tweet the IDs of the hashtags mentioned in it.     
+
+	[Twitter_Config]
+	dir = ./config
+	twitter_creds = %(dir)s/my_app_credentials
+	username = YourApplicationAccountUsername
+	listener_username = YourUsername
+	consumer_key = JvyS7DO2qd6NNTsXJ4E7zA
+	consumer_secret = 9z6157pUbOBqtbm0A0q4r29Y2EYzIHlUwbF4Cl9c
+	write_rate = 2000
+	warn_rate = 100000
+	max_caching_entries = 1000
 
 
 ## Python Twitter Tools as Submodule
