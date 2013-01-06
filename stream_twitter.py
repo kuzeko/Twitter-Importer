@@ -139,95 +139,96 @@ last_time_notified = time()
 #Computation on the Stream
 logger.info("Iterating through tweets")
 logger.info( "Warn rate is {0} , write rate is {1}".format(WARN_RATE, WRITE_RATE))
-for tweet in iterator:
-    time_start = time()
-    if ('text' in tweet and 'lang' in tweet) and (tweet['lang'] == 'en' and  tweet['text'] != None ) :
-
-        tweet_record = []
-        tweet_text_record   = []
-
-        user_data = tweet['user']
-        user_id = user_data['id']
-
-        tweet_record = data_parsers.parse_tweet_basic_infos(tweet, tweet_fields_list)        
-        tweets.append(tweet_record)
-
-        tweet_text_record = data_parsers.parse_tweet_text_infos(tweet, tweet_text_fields_list )
-        tweet_texts.append(tweet_text_record)
-
-
-        user_record = []
-        user_record = data_parsers.parse_user_infos(user_data, user_fields_list)
-        if user_record == None :
-            missing_users.append(user_id)
-        else :
-            users[user_id]=user_record
-
-        #To avoid duplicates
-        tweet_hashtags_register = []
-        count = count + 1
-        
-        if len(tweet['entities']) >0 :
-            if len(tweet['entities']['urls']) > 0  :
-                url_count = 0
-                for url in tweet['entities']['urls'] :
-                    url_count = url_count + 1
-                    urls.append([tweet['id'], user_id, url_count, url['expanded_url']])
-
-
-            if len(tweet['entities']['hashtags']) > 0  :
-                for hash in tweet['entities']['hashtags'] :
-                    hash_id = 0                    
-                    hash_text = highpoints.sub(u'', hash['text'])                    
-                    hash_text = hash_text.lower()
-                    valid_hashtag = alphanum.match(hash_text)
-                    if valid_hashtag and hash_text not in tweet_hashtags_register :
-                        partition = ord(hash_text[0])
-                        if not hash_text in inserted_hashtags :
-                            cursor.execute(insert_hashtags_sql, [hash_text, partition])
-                            conn.commit()
-                            hash_id = cursor.lastrowid                                                    
-                            
-                            if hash_id == None or hash_id == 0 :                                
-                                #Order is inverted as MySQL is not so good in deciding wich check do first 
-                                cursor.execute("SELECT id FROM hashtag h WHERE h.partitioning_value =%s AND h.hashtag = %s", [partition, hash_text])
-                                hash_id = cursor.fetchone()[0]
-                                #Again
-                                if hash_id == None or hash_id == 0 :                            
-                                    raise Exception("hash_id is {0} for {1} ".format(hash_id, hash_text) )
-                            #else :
-                            #    logger.info("Found  {0} in the databse with id {1} ".format(hash_text, hash_id.encode("ascii", "xmlcharrefreplace")))
-                                                            
-                            
-                            
-                            if len(hashtag_buffer) >= MAX_CACHING_ENTRIES :
-                                to_remove = hashtag_buffer.popleft()
-                                del inserted_hashtags[to_remove]
-                                
-                            hashtag_buffer.append(hash_text)
-                            inserted_hashtags[hash_text] = hash_id
-                                                         
-                        else :
-                            hash_id = inserted_hashtags[hash_text]
-                        
-                        hashtags.append([tweet['id'], user_id, hash_id ])
-                        tweet_hashtags_register.append(hash_text)
-                        
-        time_elapsed = time_elapsed + (time() - time_start)
-        
-        if count >= WRITE_RATE :
-            total_time = time_elapsed 
-            time_elapsed = (time_elapsed*1000) /count
-            logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.2f} millis ".format(total_time, time_elapsed))            
+try:
+    for tweet in iterator:
+        time_start = time()
+        if ('text' in tweet and 'lang' in tweet) and (tweet['lang'] == 'en' and  tweet['text'] != None ) :
+    
+            tweet_record = []
+            tweet_text_record   = []
+    
+            user_data = tweet['user']
+            user_id = user_data['id']
+    
+            tweet_record = data_parsers.parse_tweet_basic_infos(tweet, tweet_fields_list)        
+            tweets.append(tweet_record)
+    
+            tweet_text_record = data_parsers.parse_tweet_text_infos(tweet, tweet_text_fields_list )
+            tweet_texts.append(tweet_text_record)
+    
+    
+            user_record = []
+            user_record = data_parsers.parse_user_infos(user_data, user_fields_list)
+            if user_record == None :
+                missing_users.append(user_id)
+            else :
+                users[user_id]=user_record
+    
+            #To avoid duplicates
+            tweet_hashtags_register = []
+            count = count + 1
             
-            if len(missing_users) > 0 :
-                missing_count = len(missing_users)
-                for user_id in missing_users :
-                    if user_id not in users :
-                        missing_count = missing_count - 1                    
-                logger.info("Missing {0} users ".format(missing_count))
+            if len(tweet['entities']) >0 :
+                if len(tweet['entities']['urls']) > 0  :
+                    url_count = 0
+                    for url in tweet['entities']['urls'] :
+                        url_count = url_count + 1
+                        urls.append([tweet['id'], user_id, url_count, url['expanded_url']])
+    
+    
+                if len(tweet['entities']['hashtags']) > 0  :
+                    for hash in tweet['entities']['hashtags'] :
+                        hash_id = 0                    
+                        hash_text = highpoints.sub(u'', hash['text'])                    
+                        hash_text = hash_text.lower()
+                        valid_hashtag = alphanum.match(hash_text)
+                        if valid_hashtag and hash_text not in tweet_hashtags_register :
+                            partition = ord(hash_text[0])
+                            if not hash_text in inserted_hashtags :
+                                cursor.execute(insert_hashtags_sql, [hash_text, partition])
+                                conn.commit()
+                                hash_id = cursor.lastrowid                                                    
+                                
+                                if hash_id == None or hash_id == 0 :                                
+                                    #Order is inverted as MySQL is not so good in deciding wich check do first 
+                                    cursor.execute("SELECT id FROM hashtag h WHERE h.partitioning_value =%s AND h.hashtag = %s", [partition, hash_text])
+                                    hash_id = cursor.fetchone()[0]
+                                    #Again
+                                    if hash_id == None or hash_id == 0 :                            
+                                        raise Exception("hash_id is {0} for {1} ".format(hash_id, hash_text) )
+                                #else :
+                                #    logger.info("Found  {0} in the databse with id {1} ".format(hash_text, hash_id.encode("ascii", "xmlcharrefreplace")))
+                                                                
+                                
+                                
+                                if len(hashtag_buffer) >= MAX_CACHING_ENTRIES :
+                                    to_remove = hashtag_buffer.popleft()
+                                    del inserted_hashtags[to_remove]
+                                    
+                                hashtag_buffer.append(hash_text)
+                                inserted_hashtags[hash_text] = hash_id
+                                                             
+                            else :
+                                hash_id = inserted_hashtags[hash_text]
                             
-            try:
+                            hashtags.append([tweet['id'], user_id, hash_id ])
+                            tweet_hashtags_register.append(hash_text)
+                            
+            time_elapsed = time_elapsed + (time() - time_start)
+            
+            if count >= WRITE_RATE :
+                total_time = time_elapsed 
+                time_elapsed = (time_elapsed*1000) /count
+                logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.2f} millis ".format(total_time, time_elapsed))            
+                
+                if len(missing_users) > 0 :
+                    missing_count = len(missing_users)
+                    for user_id in missing_users :
+                        if user_id not in users :
+                            missing_count = missing_count - 1                    
+                    logger.info("Missing {0} users ".format(missing_count))
+                                
+
                 #logger.info("Inserting {0} tweets and {1} texts ".format(len(tweets), len(tweet_texts)))
                 time_start = time()
                 cursor.executemany(insert_tweets_sql, tweets)            
@@ -245,22 +246,7 @@ for tweet in iterator:
                 
                 logger.info("Commit..")
                 conn.commit()
-                                            
-            except Exception as e:
-                conn.rollback()                
-                logger.error("An error occurred while exectuing the query:")
-                logger.error(cursor._last_executed)
-                logger.error(e)
-                cursor.close()
-                
-                logger.info("Warn your master!")
-                now = datetime.datetime.now()
-                error_type = "{0}]".format(type(e))
-                error_message = "[ERROR: " + error_type + " "
-                pv_msg = now.strftime("%Y-%m-%d %H:%M") + error_message + "Application is shuttin down after {0} tweets!"
-                twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
-                break
-            else :
+                                                
                 time_elapsed = (time() - time_start)
                 logger.info("Queries executed in {0} seconds ".format(time_elapsed))
                 
@@ -288,8 +274,7 @@ for tweet in iterator:
                              
                 count = 0
                 time_elapsed = 0
-                
-                
+                                        
                 file = config.read('config/twitter_config.cfg')
                 WRITE_RATE_TMP = config.getint('Twitter_Config', 'write_rate')
                 WARN_RATE_TMP = config.getint('Twitter_Config', 'warn_rate')
@@ -299,9 +284,22 @@ for tweet in iterator:
                 if WARN_RATE != WARN_RATE_TMP :
                     logger.info("WARN RATE changed from {0} to {1} ".format(WARN_RATE, WARN_RATE_TMP))
                     WARN_RATE = WARN_RATE_TMP
-                
-                
-                                            
+                    
+except Exception as e:
+    conn.rollback()                
+    logger.error("An error occurred while exectuing the query:")
+    logger.error(cursor._last_executed)
+    logger.error(e)
+    cursor.close()
+    
+    logger.info("Warn your master!")
+    now = datetime.datetime.now()
+    error_type = "{0}]".format(type(e))
+    error_message = "[ERROR: " + error_type + " "
+    pv_msg = now.strftime("%Y-%m-%d %H:%M") + error_message + "Application is shuttin down after {0} tweets!"
+    twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
+
+                                                                        
     #else :
     #    print "What's this!?"
     #    print tweet
