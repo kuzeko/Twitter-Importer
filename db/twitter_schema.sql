@@ -93,7 +93,9 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_hashtag` (
   `user_id` BIGINT UNSIGNED NOT NULL ,
   `hashtag_id` BIGINT UNSIGNED NOT NULL ,
   PRIMARY KEY (`tweet_id`, `user_id`, `hashtag_id`) )
-ENGINE = MyISAM;
+ENGINE = MyISAM
+PARTITION BY HASH( `user_id` )
+PARTITIONS 6;
 
 
 -- -----------------------------------------------------
@@ -125,7 +127,10 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_url` (
   `progressive` SMALLINT UNSIGNED NOT NULL ,
   `url` TEXT NULL ,
   PRIMARY KEY (`tweet_id`, `user_id`, `progressive`) )
-ENGINE = MyISAM;
+ENGINE = MyISAM
+PARTITION BY HASH( `user_id` )
+PARTITIONS 6;
+
 
 
 
