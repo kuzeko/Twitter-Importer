@@ -301,10 +301,13 @@ try:
                     WARN_RATE = WARN_RATE_TMP
                     
 except Exception as e:
-    conn.rollback()                
-    logger.error("An error occurred while exectuing the query:")
-    
-    logger.error(cursor._last_executed)
+    conn.rollback()
+    if hasattr(cursor, '_last_executed') :                
+        logger.error("An error occurred while exectuing the query:")    
+        logger.error(cursor._last_executed)
+    else :
+        logger.error("An error occurred while parsing tweets:")
+        
     logger.error(e)
     cursor.close()
     
