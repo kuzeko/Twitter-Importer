@@ -5,6 +5,7 @@ import sys
 import warnings
 import logging
 import datetime
+import traceback
 import dateutil.parser as parser
 import ConfigParser
 import MySQLdb
@@ -302,6 +303,7 @@ try:
                     
 except Exception as e:
     conn.rollback()
+    traceb = traceback.format_exc()
     if hasattr(cursor, '_last_executed') :                
         logger.error("An error occurred while exectuing the query:")    
         logger.error(cursor._last_executed)
@@ -316,10 +318,11 @@ except Exception as e:
     error_type = "{0}]".format(e.__class__.__name__)
     error_message = "[ERROR: " + error_type + " "
     pv_msg = now.strftime("%Y-%m-%d %H:%M") + error_message + "Application is shuttin down after {0} tweets!"
+    pv_msg = pv_msg.format(total_inserted)
     logger.info("SENT: " + pv_msg)
-    twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
+    twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg)
 
-                                                                        
+    print traceb                                                               
     #else :
     #    print "What's this!?"
     #    print tweet
