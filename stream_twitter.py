@@ -313,7 +313,7 @@ except Exception as e:
     
     logger.info("Warn your master!")
     now = datetime.datetime.now()
-    error_type = "{0}]".format(type(e))
+    error_type = "{0}]".format(e.__class__.__name__)
     error_message = "[ERROR: " + error_type + " "
     pv_msg = now.strftime("%Y-%m-%d %H:%M") + error_message + "Application is shuttin down after {0} tweets!"
     twitter.direct_messages.new(user=TWITTER_LISTENER,text=pv_msg.format(total_inserted))
