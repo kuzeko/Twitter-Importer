@@ -142,7 +142,22 @@ logger.info( "Warn rate is {0} , write rate is {1}".format(WARN_RATE, WRITE_RATE
 try:
     for tweet in iterator:
         time_start = time()
-        if ('text' in tweet and 'lang' in tweet) and (tweet['lang'] == 'en' and  tweet['text'] != None ) :
+        
+        if not data_parsers.contains_fields(tweet, tweet_fields_list) :
+            continue
+        if not data_parsers.contains_fields(tweet, tweet_text_fields_list) :
+            continue
+
+        user_data = []
+        if 'user' in tweet:
+            user_data = tweet['user']
+        else :
+            continue
+
+        if not data_parsers.contains_fields(user_data, user_fields_list) :
+            continue
+            
+        if tweet['lang'] == 'en' and  tweet['text'] != None :
     
             tweet_record = []
             tweet_text_record   = []
@@ -288,6 +303,7 @@ try:
 except Exception as e:
     conn.rollback()                
     logger.error("An error occurred while exectuing the query:")
+    
     logger.error(cursor._last_executed)
     logger.error(e)
     cursor.close()
