@@ -3,7 +3,7 @@ import HTMLParser
 import dateutil.parser as parser
 
 
-def check_fields(tweet, fields_list ):
+def contains_fields(tweet, fields_list ):
     response = True
     for field in fields_list :
         response = response and (field in fields_list)
