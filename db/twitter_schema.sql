@@ -22,7 +22,10 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`tweet` (
   `lang` CHAR(2) NOT NULL DEFAULT '--' ,
   `created_at` DATETIME NOT NULL ,
   PRIMARY KEY (`id`, `user_id`) )
-ENGINE = MyISAM;
+ENGINE = MyISAM
+PARTITION BY HASH( `user_id` )
+PARTITIONS 6;
+
 
 CREATE INDEX `USER_ID` USING BTREE ON `twitter`.`tweet` (`user_id` ASC) ;
 
@@ -43,7 +46,9 @@ CREATE  TABLE IF NOT EXISTS `twitter`.`tweet_text` (
   `place_full_name` VARCHAR(160) NULL ,
   `place_id` VARCHAR(160) NULL ,
   PRIMARY KEY (`tweet_id`, `user_id`) )
-ENGINE = MyISAM;
+ENGINE = MyISAM
+PARTITION BY HASH( `user_id` )
+PARTITIONS 6;
 
 
 -- -----------------------------------------------------
