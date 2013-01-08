@@ -125,7 +125,7 @@ def parse_user_infos(user_data, user_fields_list ):
             if value == None or value < 0 :
                 return None
             user_record.append(value)            
-        elif field in ['verified', 'protected'] :
+        elif field in ['verified', 'protected', 'geo_enabled'] :
             user_record.append(user_data[field])                        
         elif field in user_data :
             if not user_data[field] :
