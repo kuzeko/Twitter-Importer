@@ -4,10 +4,10 @@ import dateutil.parser as parser
 
 
 def contains_fields(data_array, fields_list ):
-    response = True
     for field in fields_list :
-        response = response and (field in data_array)
-    return response
+        if not field in data_array :
+            return False
+    return True
 
 def parse_tweet_basic_infos(tweet, tweet_fields_list ):
     tweet_record = []
