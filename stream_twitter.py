@@ -144,10 +144,11 @@ try:
     for tweet in iterator:
         time_start = time()
         
-        if not data_parsers.contains_fields(tweet, tweet_fields_list) :
+        if not data_parsers.contains_fields(tweet, tweet_fields_list,  ['user_id']) :
+            continue        
+        if not data_parsers.contains_fields(tweet, tweet_text_fields_list, ['user_id']) :            
             continue
-        if not data_parsers.contains_fields(tweet, tweet_text_fields_list) :
-            continue
+        
 
         user_data = []
         if 'user' in tweet:

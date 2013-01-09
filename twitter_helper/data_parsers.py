@@ -3,13 +3,13 @@ import HTMLParser
 import dateutil.parser as parser
 
 
-def contains_fields(data_array, fields_list ):
+def contains_fields(data_array, fields_list, skip_list = []  ):
     for field in fields_list :
-        if not field in data_array :
+        if not field in data_array and not field in skip_list:
             return False
     return True
 
-def parse_tweet_basic_infos(tweet, tweet_fields_list ):
+def parse_tweet_basic_infos(tweet, tweet_fields_list):
     tweet_record = []
     user_data = tweet['user']
     user_id = user_data['id']
