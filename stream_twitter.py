@@ -146,7 +146,7 @@ try:
         
         if not data_parsers.contains_fields(tweet, tweet_fields_list,  ['user_id']) :
             continue        
-        if not data_parsers.contains_fields(tweet, tweet_text_fields_list, ['user_id']) :            
+        if not data_parsers.contains_fields(tweet, ['text']) :            
             continue
         
 
