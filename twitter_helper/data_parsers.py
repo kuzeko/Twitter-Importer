@@ -64,9 +64,12 @@ def parse_tweet_text_infos(tweet, tweet_text_fields_list ):
                 tweet_text_record.append(tweet['geo']['coordinates'][1])                
         elif field == 'place_full_name' :
             if not tweet['place'] :
-                tweet_text_record.append('')
+                value = ''
             else :
-                tweet_text_record.append(tweet['place']['full_name'])                
+                value = tweet['place']['full_name'].strip()
+                value = highpoints.sub(u'', value)
+                value = html_parser.unescape(value)            
+            tweet_text_record.append(value)                
         elif field == 'place_id' :
             # http://api.twitter.com/1/geo/id/6b9ed4869788d40e.json
             if not tweet['place'] :
