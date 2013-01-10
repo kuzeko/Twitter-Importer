@@ -136,17 +136,22 @@ twitter.statuses.update(status=line)
 twitter.direct_messages.new(user=TWITTER_LISTENER, text=now.strftime("%Y-%m-%d %H:%M") + " started downloading tweets ")
 last_time_notified = time()
 
-
+skipped_count = 0 
 #Computation on the Stream
 logger.info("Iterating through tweets")
 logger.info( "Warn rate is {0} , write rate is {1}".format(WARN_RATE, WRITE_RATE))
 try:
     for tweet in iterator:
         time_start = time()
-        
+        if skipped_count > WRITE_RATE :
+            raise ValueError("We skipped {0} objects".format(skipped_count))
+
+            
         if not data_parsers.contains_fields(tweet, tweet_fields_list,  ['user_id']) :
+            skipped_count = skipped_count + 1
             continue        
-        if not data_parsers.contains_fields(tweet, ['text']) :            
+        if not data_parsers.contains_fields(tweet, ['text']) :
+            skipped_count = skipped_count + 1            
             continue
         
 
@@ -154,9 +159,11 @@ try:
         if 'user' in tweet:
             user_data = tweet['user']
         else :
+            skipped_count = skipped_count + 1
             continue
 
         if not data_parsers.contains_fields(user_data, user_fields_list) :
+            skipped_count = skipped_count + 1
             continue
             
         if tweet['lang'] == 'en' and  tweet['text'] != None :
@@ -183,9 +190,11 @@ try:
     
             #To avoid duplicates
             tweet_hashtags_register = []
+            #If we find a good tweet we reset the error count
+            skipped_count = 0
             count = count + 1
             
-            if len(tweet['entities']) >0 :
+            if len(tweet['entities']) >0 :                
                 if len(tweet['entities']['urls']) > 0  :
                     url_count = 0
                     for url in tweet['entities']['urls'] :
