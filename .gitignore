@@ -1,0 +1,7 @@
+.DS_Store
+.project
+.pydevproject
+twitter_schema.mwb.bak
+my_app_credentials
+twitter_config.cfg
+*.pyc
