@@ -11,7 +11,7 @@ It makes use of the pretty good implementation of [sixohsix's Python Twitter Too
 
 Visit the Twitter developer page and create a new application: https://dev.twitter.com/apps/
 
-There you will get you a CONSUMER_KEY and CONSUMER_SECRET.
+There you will get your `CONSUMER_KEY` and `CONSUMER_SECRET`.
 
 Then edit the file
 
@@ -21,13 +21,13 @@ Currently the project contains a little script to materialise Twitter OAuth cred
 
     oauth_dance.py
 
-
-A few HTTP calls to twitter are required to do this.
+Run it first once you have updated the config file with your consumer key and secret.
+A few HTTP calls to twitter are required to run this.
 Please see the twitter.oauth_dance module to see how this is done.
 If you are making a command-line app, you can use the oauth_dance() function directly.
 
-Performing the "oauth dance" gets you an ouath token and oauth secret that authenticate the user with Twitter.
-This process should save these for later so that the user doesn't have to do the oauth dance again.
+Performing the "oauth dance" gets you an oauth token and oauth secret that authenticate the user with Twitter.
+This process should save these on a file for later, so that the user doesn't have to do the oauth dance again.
 
 Keep them secret!
 
@@ -44,14 +44,14 @@ The first section contans the authentication parameters to the database, where t
     db_password = th3p4$$w0rd
     
 
-The secon section instead contains the path to the configuration directory, relative to the root of the project.
+The second section instead contains the path to the configuration directory, relative to the root of the project.
 The name of the file where the OAuth credentials are stored.
 The username of the twitter account under which the application is running.
-The Twitter username to which the application will send a Direct Message once the number of tweets declared into `warn_rate` tweets have been downloaded.
-You want this to notify you that the application is still running and to be updated on its actual performances.    
+The Twitter username to which the application will send a Direct Message once the number of tweets declared into `warn_rate` have been downloaded.
+You want this to notify you that the application is still running and to stay updated about its actual performances.    
 Consumer secret and Consumer keys are required for the OAuth authentication.
 `write_rate` specifies the number of tweets to download before writing them to the database.
-`max_caching_entries` refers to the number of hashtags IDs to keep in memory, it is needed to limit the number of query to the database when we need to store for each tweet the IDs of the hashtags mentioned in it.     
+`max_caching_entries` refers to the number of hashtags IDs to keep in memory, it is needed to limit the number of queries to the database when we need to store for each tweet the IDs of the hashtags mentioned in it.     
 
 	[Twitter_Config]
 	dir = ./config
@@ -68,10 +68,10 @@ Consumer secret and Consumer keys are required for the OAuth authentication.
 ## Python Twitter Tools as Submodule
 
 
-[Sixohsix's Python Twitter Tools](https://github.com/sixohsix/twitter) are included as a submodule.
-You can read more about [Submodules Git Tool](http://git-scm.com/book/en/Git-Tools-Submodules), basically when you receive the project, you get the directories that contain the submodule, but none of the files yet:
+[Sixohsix's Python Twitter Tools](https://github.com/sixohsix/twitter) is included as a submodule.
+You can read more about [Submodules Git Tool](http://git-scm.com/book/en/Git-Tools-Submodules), basically when you receive the project, you get the directory that contains the submodule, but none of the files yet.
 
-So you should enter the directory, and then init the sbmodule and update it.
+So you should enter the directory, and then init the submodule and update it as follows
 
     cd lib/twitter-python
     git submodule init
