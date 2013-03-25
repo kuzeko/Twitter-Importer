@@ -77,7 +77,10 @@ So you should enter the directory, and then init the submodule and update it as 
     git submodule init
     git submodule update
 
+Then the module need to be installe
 
+    cd lib/twitter-python
+    sudo python setup.py install
 
 
 # Licence
