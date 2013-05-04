@@ -243,6 +243,7 @@ try:
                 time_start = time()
                 cursor.executemany(insert_tweets_sql, tweets)
                 cursor.executemany(insert_tweets_texts_sql, tweet_texts)
+                logger.info("Inserted {0} tweets and {1} texts in {2} sec".format(len(tweets), len(tweet_texts), time()-time_start))
 
                 #logger.info("Inserting {0} tweet urls ".format(len(urls)))
                 cursor.executemany(insert_tweets_urls_sql, urls)
