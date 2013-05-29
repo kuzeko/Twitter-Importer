@@ -5,6 +5,16 @@ This is an ongoing project to build a downloader for Tweets into a relational Da
 
 It makes use of the pretty good implementation of [sixohsix's Python Twitter Tools](https://github.com/sixohsix/twitter)
 
+It is designed to download tweets from [the streaming API](https://dev.twitter.com/docs/streaming-apis), save english tweets in a MySQL database, and to notify you now and then about the status of the download. 
+
+
+## Set Up
+To have this running, you should :
+   0. Download the code – including [sixohsix's Python Twitter Tools](https://github.com/sixohsix/twitter ) and make sure to have all libraries up and running;
+   1. Set up a Twitter APP and obtain an API KEY;
+   2. Set up the MySQL Database, the schema is in the `db` folder;
+   3. Change the configuration file following your setup;
+
 
 ## Authentication
 
@@ -12,6 +22,7 @@ It makes use of the pretty good implementation of [sixohsix's Python Twitter Too
 Visit the Twitter developer page and create a new application: https://dev.twitter.com/apps/
 
 There you will get your `CONSUMER_KEY` and `CONSUMER_SECRET`.
+Make sure your app and token have both read and write permissions.
 
 Then edit the file
 
