@@ -14,6 +14,9 @@ To have this running, you should :
    1. Set up a Twitter APP and obtain an API KEY;
    2. Set up the MySQL Database, the schema is in the `db` folder;
    3. Change the configuration file following your setup;
+   4. Run `stream_tweet.py`
+
+Some notes about step *1* and *3* are below.
 
 
 ## Authentication
