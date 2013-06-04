@@ -148,7 +148,7 @@ logger.info("Warn rate is {0} , write rate is {1}".format(WARN_RATE, WRITE_RATE)
 try:
     for tweet in iterator:
         time_start = time()
-        if skipped_count % 100 = 0:
+        if skipped_count % 100 == 0:
             logger.info("Skipped {0} object".format(skipped_count))
         if skipped_count > WRITE_RATE:
             raise ValueError("We skipped {0} objects".format(skipped_count))
@@ -171,7 +171,7 @@ try:
             skipped_count = skipped_count + 1
             continue
 
-        if (FILTER_LANG =="xx" or tweet['lang'] == FILTER_LANG) and tweet['text'] is not None:
+        if (FILTER_LANG == "xx" or tweet['lang'] == FILTER_LANG) and tweet['text'] is not None:
 
             tweet_record = []
             tweet_text_record = []
@@ -240,7 +240,7 @@ try:
 
                             hashtags.append([tweet['id'], user_id, hash_id])
                             tweet_hashtags_register.append(hash_text)
-            if DEMO :
+            if DEMO:
                 logger.info("Retrieved: " + tweet['text'])
 
             time_elapsed = time_elapsed + (time() - time_start)
@@ -334,7 +334,7 @@ except Exception as e:
 
     logger.error(e)
 
-    if DM_NOTIFICATIONS :
+    if DM_NOTIFICATIONS:
         logger.info("Warn your master!")
         now = datetime.datetime.now()
         error_type = "{0}]".format(e.__class__.__name__)
