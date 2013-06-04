@@ -45,6 +45,10 @@ This process should save these on a file for later, so that the user doesn't hav
 
 Keep them secret!
 
+## Authentication pt. 2
+Due to a problem with [sixohsix's Python Twitter Tools](https://github.com/sixohsix/twitter), namely [a wild 401 error with OAuth](https://github.com/sixohsix/twitter/issues/133) you need to use the traditional Username/Password authentication method for the moment.
+**Any hint or solution to this problem is warmly welcome!**
+
 ## Configuration
 
 The configuration file is organized as follows:
@@ -61,22 +65,35 @@ The first section contans the authentication parameters to the database, where t
 The second section instead contains the path to the configuration directory, relative to the root of the project.
 The name of the file where the OAuth credentials are stored.
 The username of the twitter account under which the application is running.
+The password for that account - this should be avoided, but we are waiting for a fix with the OAuth authentication.
 The Twitter username to which the application will send a Direct Message once the number of tweets declared into `warn_rate` have been downloaded.
-You want this to notify you that the application is still running and to stay updated about its actual performances.    
+A flag to switch from OAuth authentication to traditional Username/Password - required at the time of writing.
+You want this to notify you that the application is still running and to stay updated about its actual performances. 
+There is flag for that: `direct_message_notification`.
+The `language` field filters tweets by their language code - use `xx` as value to download every tweet.
+
 Consumer secret and Consumer keys are required for the OAuth authentication.
 `write_rate` specifies the number of tweets to download before writing them to the database.
 `max_caching_entries` refers to the number of hashtags IDs to keep in memory, it is needed to limit the number of queries to the database when we need to store for each tweet the IDs of the hashtags mentioned in it.     
+When activating the `demo_mode` instead of saving anything to the database, you will just received a print out on screen of the tweets that have been downloaded.
+
 
 	[Twitter_Config]
 	dir = ./config
-	twitter_creds = %(dir)s/my_app_credentials
-	username = YourApplicationAccountUsername
-	listener_username = YourUsername
-	consumer_key = JvyS7DO2qd6NNTsXJ4E7zA
-	consumer_secret = 9z6157pUbOBqtbm0A0q4r29Y2EYzIHlUwbF4Cl9c
-	write_rate = 2000
-	warn_rate = 100000
-	max_caching_entries = 1000
+  twitter_creds = %(dir)s/my_app_credentials
+  username = YourApplicationAccountUsername
+  password = YourApplicationAccountPassword
+  listener_username = YourUsername
+  use_oauth = True
+  consumer_key = JvyS7DO2qd6NNTsXJ4E7zA
+  consumer_secret = 9z6157pUbOBqtbm0A0q4r29Y2EYzIHlUwbF4Cl9c
+  direct_message_notification = True
+  language = en
+  demo_mode = On
+  write_rate = 2000
+  warn_rate = 100000
+  max_caching_entries = 1000
+
 
 
 ## Python Twitter Tools as Submodule

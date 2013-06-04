@@ -33,25 +33,30 @@ DB_USER             = config.get('DB_Config', 'db_user')
 DB_PASS             = config.get('DB_Config', 'db_password')
 CREDS_FILE          = config.get('Twitter_Config', 'twitter_creds')
 TWITTER_USERNAME    = config.get('Twitter_Config', 'username')
-TWITTER_LISTENER    = config.get('Twitter_Config', 'listener_username')
+TWITTER_PASSWORD    = config.get('Twitter_Config', 'password')
+USE_OAUTH           = config.getboolean('Twitter_Config', 'use_oauth')
 CONSUMER_KEY        = config.get('Twitter_Config', 'consumer_key')
 CONSUMER_SECRET     = config.get('Twitter_Config', 'consumer_secret')
 WRITE_RATE          = config.getint('Twitter_Config', 'write_rate')
 WARN_RATE           = config.getint('Twitter_Config', 'warn_rate')
+DM_NOTIFICATIONS    = config.getboolean('Twitter_Config', 'direct_message_notification')
+TWITTER_LISTENER    = config.get('Twitter_Config', 'listener_username')
+FILTER_LANG         = config.get('Twitter_Config', 'language')
+DEMO                = config.getboolan('Twitter_Config', 'demo_mode')
 #How many hashtags IDs to store in memory
 MAX_CACHING_ENTRIES = config.getint('Twitter_Config', 'max_caching_entries')
 
 TWITTER_CREDS       = os.path.expanduser(CREDS_FILE)
 
-#Try authentication!
-oauth_token, oauth_secret = read_token_file(TWITTER_CREDS)
-oauth = OAuth(oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_SECRET)
 
-#Connection to the Database
-logger.info("Trying to connect to" + DB_HOST + "...")
-conn = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME, charset='utf8')
-cursor = conn.cursor()
-logger.info("...done!")
+if DEMO :
+    logger.info("Running in Demo Mode: No connection the Database - Tweets will not be saved!")
+else :
+    #Connection to the Database
+    logger.info("Trying to connect to" + DB_HOST + "...")
+    conn = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME, charset='utf8')
+    cursor = conn.cursor()
+    logger.info("...done!")
 
 
 #Prepare queries
@@ -84,16 +89,22 @@ insert_users_sql = 'REPLACE INTO user (' + user_fields + ') VALUES (' + user_pla
 
 
 #Connecting to Twitter
+#Try authentication!
 logger.info("Connecting to twitter API...")
-twitter = Twitter(auth=oauth)
+if USE_OAUTH:
+    oauth_token, oauth_secret = read_token_file(TWITTER_CREDS)
+    auth_mode = OAuth(oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_SECRET)
+    logger.info("Authentication mode : OAuth")
+else:
+    auth_mode = UserPassAuth(TWITTER_USERNAME, TWITTER_PASSWORD)
+    logger.info("Authentication mode : User/Passsword")
+
+twitter = Twitter(auth=auth_mode)
 logger.info("Connecting to the stream...")
-twitter_stream = TwitterStream(auth=oauth)
+twitter_stream = TwitterStream(auth=auth_mode)
 iterator = twitter_stream.statuses.sample()
 logger.info("Got connection!")
 
-#This is just for fun
-logger.info("Reading Hamlet, for real!")
-text_file = open("./Hamlet.txt")
 
 
 ########## Use the stream ###############
@@ -118,13 +129,17 @@ time_start = 0
 last_time_notified = 0
 
 
-#We update the application status and we notify the Listener account via DM
-logger.info("Tweeting for starters!")
-line = twitter_util.prepare_quote(text_file)
-now = datetime.datetime.now()
-twitter.statuses.update(status=line)
-twitter.direct_messages.new(user=TWITTER_LISTENER, text=now.strftime("%Y-%m-%d %H:%M") + " started downloading tweets ")
-last_time_notified = time()
+#This is just for fun
+if DM_NOTIFICATIONS:
+    logger.info("Reading Hamlet, for real!")
+    text_file = open("./Hamlet.txt")
+    #We update the application status and we notify the Listener account via DM
+    logger.info("Tweeting for starters!")
+    line = twitter_util.prepare_quote(text_file)
+    now = datetime.datetime.now()
+    twitter.statuses.update(status=line)
+    twitter.direct_messages.new(user=TWITTER_LISTENER, text=now.strftime("%Y-%m-%d %H:%M") + " started downloading tweets ")
+    last_time_notified = time()
 
 skipped_count = 0
 #Computation on the Stream
@@ -133,6 +148,8 @@ logger.info("Warn rate is {0} , write rate is {1}".format(WARN_RATE, WRITE_RATE)
 try:
     for tweet in iterator:
         time_start = time()
+        if skipped_count % 100 = 0:
+            logger.info("Skipped {0} object".format(skipped_count))
         if skipped_count > WRITE_RATE:
             raise ValueError("We skipped {0} objects".format(skipped_count))
 
@@ -154,7 +171,7 @@ try:
             skipped_count = skipped_count + 1
             continue
 
-        if tweet['lang'] == 'en' and tweet['text'] is not None:
+        if (FILTER_LANG =="xx" or tweet['lang'] == FILTER_LANG) and tweet['text'] is not None:
 
             tweet_record = []
             tweet_text_record = []
@@ -181,7 +198,7 @@ try:
             skipped_count = 0
             count = count + 1
 
-            if len(tweet['entities']) > 0:
+            if not DEMO and len(tweet['entities']) > 0:
                 if len(tweet['entities']['urls']) > 0:
                     url_count = 0
                     for url in tweet['entities']['urls']:
@@ -202,7 +219,7 @@ try:
                                 hash_id = cursor.lastrowid
 
                                 if hash_id is None or hash_id == 0:
-                                    #Order is inverted as MySQL is not so good in deciding wich check do first
+                                    #Order is inverted as MySQL is not so good in deciding which check do first
                                     cursor.execute("SELECT id FROM hashtag h WHERE h.partitioning_value =%s AND h.hashtag = %s", [partition, hash_text])
                                     hash_id = cursor.fetchone()[0]
                                     #Again
@@ -223,10 +240,12 @@ try:
 
                             hashtags.append([tweet['id'], user_id, hash_id])
                             tweet_hashtags_register.append(hash_text)
+            if DEMO :
+                logger.info("Retrieved: " + tweet['text'])
 
             time_elapsed = time_elapsed + (time() - time_start)
 
-            if count >= WRITE_RATE:
+            if not DEMO and count >= WRITE_RATE:
                 total_time = time_elapsed
                 # Convert to millis and divide for each tweet
                 time_elapsed = (time_elapsed*1000) / count
@@ -295,27 +314,35 @@ try:
                 if WARN_RATE != WARN_RATE_TMP:
                     logger.info("WARN RATE changed from {0} to {1} ".format(WARN_RATE, WARN_RATE_TMP))
                     WARN_RATE = WARN_RATE_TMP
+        else:
+            skipped_count = skipped_count + 1
+            continue
+
 
 except Exception as e:
-    conn.rollback()
-    traceb = traceback.format_exc()
-    if hasattr(cursor, '_last_executed'):
-        logger.error("An error occurred while exectuing the query:")
-        logger.error(cursor._last_executed)
+    if not DEMO:
+        conn.rollback()
+        traceb = traceback.format_exc()
+        if hasattr(cursor, '_last_executed'):
+            logger.error("An error occurred while exectuing the query:")
+            logger.error(cursor._last_executed)
+        else:
+            logger.error("An error occurred while parsing tweets:")
+        cursor.close()
     else:
-        logger.error("An error occurred while parsing tweets:")
+        logger.error("An error occurred while parsing tweets in DEMO mode:")
 
     logger.error(e)
-    cursor.close()
 
-    logger.info("Warn your master!")
-    now = datetime.datetime.now()
-    error_type = "{0}]".format(e.__class__.__name__)
-    error_message = "[ERROR: " + error_type + " "
-    pv_msg = now.strftime("%Y-%m-%d %H:%M") + error_message + "Application is shuttin down after {0} tweets!"
-    pv_msg = pv_msg.format(total_inserted)
-    logger.info("SENT: " + pv_msg)
-    twitter.direct_messages.new(user=TWITTER_LISTENER, text=pv_msg)
+    if DM_NOTIFICATIONS :
+        logger.info("Warn your master!")
+        now = datetime.datetime.now()
+        error_type = "{0}]".format(e.__class__.__name__)
+        error_message = "[ERROR: " + error_type + " "
+        pv_msg = now.strftime("%Y-%m-%d %H:%M") + error_message + "Application is shuttin down after {0} tweets!"
+        pv_msg = pv_msg.format(total_inserted)
+        logger.info("SENT: " + pv_msg)
+        twitter.direct_messages.new(user=TWITTER_LISTENER, text=pv_msg)
 
     print traceb
     #else :
@@ -325,7 +352,8 @@ except Exception as e:
 
 print "-------"
 print count
-cursor.close()
+if not DEMO:
+    cursor.close()
 
 
 
