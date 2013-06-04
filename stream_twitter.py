@@ -42,7 +42,7 @@ WARN_RATE           = config.getint('Twitter_Config', 'warn_rate')
 DM_NOTIFICATIONS    = config.getboolean('Twitter_Config', 'direct_message_notification')
 TWITTER_LISTENER    = config.get('Twitter_Config', 'listener_username')
 FILTER_LANG         = config.get('Twitter_Config', 'language')
-DEMO                = config.getboolan('Twitter_Config', 'demo_mode')
+DEMO                = config.getboolean('Twitter_Config', 'demo_mode')
 #How many hashtags IDs to store in memory
 MAX_CACHING_ENTRIES = config.getint('Twitter_Config', 'max_caching_entries')
 
