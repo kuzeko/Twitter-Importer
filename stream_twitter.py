@@ -148,8 +148,8 @@ logger.info("Warn rate is {0} , write rate is {1}".format(WARN_RATE, WRITE_RATE)
 try:
     for tweet in iterator:
         time_start = time()
-        if skipped_count % 100 == 0:
-            logger.info("Skipped {0} object".format(skipped_count))
+        if skipped_count+count > 0 and skipped_count+count % 100 == 0:
+            logger.info("Skipped {0} objects and Downloaded {1}".format(skipped_count, count))
         if skipped_count > WRITE_RATE:
             raise ValueError("We skipped {0} objects".format(skipped_count))
 
