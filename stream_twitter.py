@@ -91,17 +91,22 @@ insert_users_sql = 'REPLACE INTO user (' + user_fields + ') VALUES (' + user_pla
 #Connecting to Twitter
 #Try authentication!
 logger.info("Connecting to twitter API...")
-if USE_OAUTH:
-    oauth_token, oauth_secret = read_token_file(TWITTER_CREDS)
-    auth_mode = OAuth(oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_SECRET)
-    logger.info("Authentication mode : OAuth")
-else:
-    auth_mode = UserPassAuth(TWITTER_USERNAME, TWITTER_PASSWORD)
-    logger.info("Authentication mode : User/Passsword")
+oauth_token, oauth_secret = read_token_file(TWITTER_CREDS)
+oauth_auth_mode = OAuth(oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_SECRET)
+user_auth_mode = UserPassAuth(TWITTER_USERNAME, TWITTER_PASSWORD)
 
-twitter = Twitter(auth=auth_mode)
+twitter = Twitter(auth=oauth_auth_mode)
+
 logger.info("Connecting to the stream...")
-twitter_stream = TwitterStream(auth=auth_mode)
+if USE_OAUTH:
+    twitter_stream = TwitterStream(auth=oauth_auth_mode)
+    logger.info("Authentication mode for Stream: OAuth")
+else:
+    twitter_stream = TwitterStream(auth=user_auth_mode)
+    logger.info("Authentication mode for Stream: User/Passsword")
+
+
+
 iterator = twitter_stream.statuses.sample()
 logger.info("Got connection!")
 
