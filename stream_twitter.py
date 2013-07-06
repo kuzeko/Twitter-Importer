@@ -202,7 +202,7 @@ try:
             urls = data_parser.urls_queue
             hashtags = data_parser.hashtags_queue
 
-            total_inserted += tweet.size()
+            total_inserted += tweets.size()
 
             db_job = threading.Thread(target=connector.insert_records,
                                       args=(tweets, tweet_texts, users, urls, hashtags, message_queue))
