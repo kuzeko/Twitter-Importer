@@ -192,7 +192,7 @@ try:
 
         if not DEMO:
             logger.info("Creating connector to the Database")
-            logger.info("Opening connection to DB " + db + " on " + host + "...")
+            logger.info("Opening connection to DB " + DB_NAME + " on " + DB_HOST + "...")
             connector = DBConnector(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME, charset='utf8', parser=data_parser, cache_size=MAX_CACHING_ENTRIES)
             logger.info("...done!")
             """ Get the queues """
