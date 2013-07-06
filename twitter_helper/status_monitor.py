@@ -13,5 +13,5 @@ class ProcessMonitor:
                 else:
                     print message[1]
             else:
-                raise RuntimeError(message[1])
+                raise Exception(message[1])
             message_queue.task_done()

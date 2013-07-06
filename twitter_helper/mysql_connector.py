@@ -99,11 +99,11 @@ class MysqlTwitterConnector:
             time_elapsed = (time() - time_start)
             message_queue.put((1, "Queries executed in {0} seconds ".format(time_elapsed)))
         except Exception:
+            error_message = "An error occurred while executing the query:\n"
             if hasattr(self.cursor, '_last_executed'):
-                message_queue.put((-1, "An error occurred while executing the query:\n"+self.cursor._last_executed))
-            else:
-                trace = traceback.format_exc()
-                message_queue.put((-1, "An error occurred while parsing tweets:\n"+trace))
+                error_message += self.cursor._last_executed
+            trace = traceback.format_exc()
+            message_queue.put((-1, error_message + "\n" + trace))
         finally:
             self.close()
 
