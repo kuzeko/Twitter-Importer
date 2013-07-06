@@ -6,7 +6,7 @@ class ProcessMonitor:
         while True:
             message = messages.get()
             if message[0] > 0:
-                if logger not None:
+                if logger is not None:
                     logger.info(message[1])
                 else:
                     print message[1]
