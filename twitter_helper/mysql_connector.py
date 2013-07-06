@@ -11,14 +11,13 @@ class MysqlTwitterConnector:
 
     @staticmethod
     def test(host, user, passwd, db, charset='utf8'):
-        with MySQLdb.connect(host=host, user=user, passwd=passwd, db=db, charset=charset) as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*), VERSION() from tweet")
-            ver = cursor.fetchone()
-            cursor.close()
-            conn.close()
-            return ver is not None
-        return False
+        conn = MySQLdb.connect(host=host, user=user, passwd=passwd, db=db, charset=charset)
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*), VERSION() from tweet")
+        ver = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        return ver is not None
 
     @staticmethod
     def get_all_elements(queue):
