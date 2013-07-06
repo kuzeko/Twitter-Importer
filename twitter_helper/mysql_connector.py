@@ -104,7 +104,7 @@ class MysqlTwitterConnector:
                 error_message += self.cursor._last_executed
             trace = traceback.format_exc()
             message_queue.put((-1, error_message + "\n" + trace))
-            self.conn.rollback();
+            self.conn.rollback()
         finally:
             self.close()
 
@@ -137,9 +137,8 @@ class MysqlTwitterConnector:
                 inserted_hashtags[hash_text] = hash_id
             else:
                 hash_id = inserted_hashtags[hash_text]
-            record = []
             # 'tweet_id', 'user_id', 'hashtag_id'
-            record.append(hashtag[2], hashtag[3], hash_id)
+            record = [hashtag[2], hashtag[3], hash_id]
             parsed_hashtags.append(record)
         return parsed_hashtags
 
