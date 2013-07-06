@@ -131,7 +131,7 @@ try:
         """ Size of the buffer of tweets to write in the DB """
         buffer_size = WRITE_RATE
         """ Prepare parser with some larger buffer size """
-        data_parser = TwitterData(buffer_size  + (buffer_size/100));
+        data_parser = TwitterData(buffer_size  + (buffer_size/100))
         """ Get the tweets - this is also important to be refreshed every now and then """
         iterator = twitter_stream.statuses.sample()
         logger.info("Got Stream connection!")
@@ -165,7 +165,7 @@ try:
 
             skip_tweet = not data_parser.contains_fields(user_data, TwitterData.user_fields_list)
 
-            """ if all fields are in place and also the language of the text is acceptable """"
+            """ if all fields are in place and also the language of the text is acceptable """
             if not skip_tweet and ("None" in FILTER_LANG or tweet['lang'] in FILTER_LANG) and tweet['text'] is not None:
 
                 if DEMO:
@@ -205,7 +205,7 @@ try:
             total_inserted += tweet.size()
 
             db_job = threading.Thread(target=connector.insert_records,
-                args=(tweets, tweet_texts, users, urls, hashtags, message_queue))
+                                      args=(tweets, tweet_texts, users, urls, hashtags, message_queue))
             db_job.start()
 
             logger.info("downloaded for insertion {0} tweets up to now ".format(total_inserted))
@@ -226,7 +226,6 @@ try:
                 minutes = (time()-last_time_notified)/60
                 twitter.direct_messages.new(user=TWITTER_LISTENER, text=prv_msg.format(total_inserted, minutes))
                 last_time_notified = time()
-
 
             time_elapsed = 0
 
@@ -259,4 +258,4 @@ except Exception as e:
 print "-------"
 """ Wait for jobs on the message queue to finish """
 message_queue.join()
-print  total_inserted
+print total_inserted
