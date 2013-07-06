@@ -119,7 +119,7 @@ try:
     """ Setup a messaging queue to track activities """
     message_queue = Queue.PriorityQueue()
     monitoring_job = threading.Thread(target=ProcessMonitor.print_messages,
-                                      args=(logger=logger, messages=message_queue))
+                                      args=(message_queue, logger))
     monitoring_job.daemon = True
     monitoring_job.start()
 
