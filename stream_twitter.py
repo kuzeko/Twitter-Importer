@@ -189,6 +189,8 @@ try:
         time_per_tweet = (time_elapsed*1000) / inserted_count
         time_iteration = (time_elapsed*1000) / iteration_count
         logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.3f} millis - 1 iteration rate {2:.3f} millis ".format(time_elapsed, time_per_tweet, time_iteration))
+        inserted_count = 0
+        iteration_count = 0
 
         if not DEMO:
             logger.info("Creating connector to the Database")
