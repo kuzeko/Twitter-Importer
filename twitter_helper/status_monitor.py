@@ -14,4 +14,4 @@ class ProcessMonitor:
                     print message[1]
             else:
                 raise RuntimeError(message[1])
-            message.task_done()
+            message_queue.task_done()
