@@ -179,9 +179,9 @@ class TwitterData:
             return False
 
         #Enqueue
-        self.tweets_queue.append(tweet_record)
-        self.tweet_texts_queue.append(tweet_text_record)
-        self.users_queue.append(user_record)
+        self.tweets_queue.put(tweet_record)
+        self.tweet_texts_queue.put(tweet_text_record)
+        self.users_queue.put(user_record)
 
         #To avoid duplicates
         tweet_inserted_hashtags = []
@@ -191,7 +191,7 @@ class TwitterData:
                 url_count = 0
                 for url in tweet['entities']['urls']:
                     url_count = url_count + 1
-                    self.urls_queue.append([tweet['id'], user_id, url_count, url['expanded_url']])
+                    self.urls_queue.put([tweet['id'], user_id, url_count, url['expanded_url']])
 
             if len(tweet['entities']['hashtags']) > 0:
                 for hash in tweet['entities']['hashtags']:
@@ -200,6 +200,6 @@ class TwitterData:
                     valid_hashtag = self.alphanum.match(hash_text)
                     if valid_hashtag and hash_text not in tweet_inserted_hashtags:
                         partition = ord(hash_text[0])
-                        self.hashtags_queue.append([hash_text, partition, tweet['id'], user_id])
+                        self.hashtags_queue.put([hash_text, partition, tweet['id'], user_id])
                         tweet_inserted_hashtags.append(hash_text)
         return True

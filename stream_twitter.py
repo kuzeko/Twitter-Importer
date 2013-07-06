@@ -131,7 +131,7 @@ try:
         """ Size of the buffer of tweets to write in the DB """
         buffer_size = WRITE_RATE
         """ Prepare parser with some larger buffer size """
-        data_parser = TwitterData(buffer_size  + (buffer_size/100))
+        data_parser = TwitterData(buffer_size + (buffer_size/100))
         """ Get the tweets - this is also important to be refreshed every now and then """
         iterator = twitter_stream.statuses.sample()
         logger.info("Got Stream connection!")
