@@ -86,7 +86,7 @@ class MysqlTwitterConnector:
 
             #logger.info("Inserting {0} tweet hashtags ".format(len(hashtags)))
             hashtags = MysqlTwitterConnector.get_all_elements(hashtags_queue)
-            tweet_hashtags = self.inserted_hashtags(hashtags)
+            tweet_hashtags = self.insert_hashtags(hashtags)
             self.cursor.executemany(self.insert_tweets_hashtags_sql, tweet_hashtags)
 
             users = MysqlTwitterConnector.get_all_elements(users_queue)
@@ -104,6 +104,7 @@ class MysqlTwitterConnector:
                 error_message += self.cursor._last_executed
             trace = traceback.format_exc()
             message_queue.put((-1, error_message + "\n" + trace))
+            self.conn.rollback();
         finally:
             self.close()
 
