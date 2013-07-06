@@ -146,7 +146,7 @@ try:
                 skip_tweet = False
 
             if iteration_count % WRITE_RATE == 0:
-                logger.info("Skipped {0} objects, Inserted {1} and Downloaded {2}".format(skipped_count, inserted_count, iteration_count))
+                logger.info("Skipped from last good tweet {0} objects, Inserted {1} and Downloaded {2}".format(skipped_count, inserted_count, iteration_count))
 
             """ Check if the tweet contains all the necessary fields """
             skip_tweet = not data_parser.contains_fields(tweet, TwitterData.tweet_fields_list,  ['user_id'])
