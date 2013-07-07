@@ -101,6 +101,7 @@ logger.info("Warn rate is {0} , write rate is {1}".format(WARN_RATE, WRITE_RATE)
 try:
     continue_download = True
     skip_tweet = False
+    application_start_time = time()
 
     # """ Setup a messaging queue to track activities """
     # message_queue = Queue.PriorityQueue()
@@ -132,7 +133,7 @@ try:
                 skip_tweet = False
 
             if iteration_count % WRITE_RATE == 0:
-                logger.info("Skipped from last good tweet {0} objects, Inserted {1} and Downloaded {2}".format(skipped_count, inserted_count, iteration_count))
+                logger.info("Skipped {0} objects, Inserted {1} and Downloaded {2}".format(skipped_count, inserted_count, iteration_count))
 
             """ Check if the tweet contains all the necessary fields """
             skip_tweet = not data_parser.contains_fields(tweet, TwitterData.tweet_fields_list,  ['user_id'])
@@ -161,10 +162,8 @@ try:
                     """ put the tweet in the queue to be inserted later """
                     sucess = data_parser.enqueue_tweet_data(tweet)
 
-                """ If we find a good tweet we reset the error count """
                 if sucess:
                     inserted_count += 1
-                    skipped_count = 0
                     """ If buffer is full stop downloading and start a writing thread """
                     if inserted_count >= WRITE_RATE:
                         break
@@ -175,6 +174,8 @@ try:
         time_per_tweet = (time_elapsed*1000) / inserted_count
         time_iteration = (time_elapsed*1000) / iteration_count
         logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.3f} millis - 1 iteration rate {2:.3f} millis ".format(time_elapsed, time_per_tweet, time_iteration))
+        """ reset the error count """
+        skipped_count = 0
         inserted_count = 0
         iteration_count = 0
 
@@ -196,7 +197,7 @@ try:
                                       args=(tweets, tweet_texts, users, urls, hashtags, logger))
             db_job.start()
 
-            logger.info("Downloaded for insertion {0} tweets up to now ".format(total_inserted))
+            logger.info("Downloaded for insertion {0} tweets up to now after {1} secs ".format(total_inserted, (time() - application_start_time)))
 
             if DM_NOTIFICATIONS and total_inserted % WARN_RATE == 0:
                 logger.info("Tweeting status!")
