@@ -61,7 +61,7 @@ class MysqlTwitterConnector:
         user_placeholders = ', '.join(['%s']*len(data_parser.user_fields_list))
         self.insert_users_sql = 'REPLACE INTO user (' + user_fields + ') VALUES (' + user_placeholders + ') '
 
-    def insert_records(self, tweets_queue, tweet_texts_queue, users_queue, urls_queue, hashtags_queue, message_queue):
+    def insert_records(self, tweets_queue, tweet_texts_queue, users_queue, urls_queue, hashtags_queue, logger=None):
         try:
             """ Catch  MySQL errors/warnings """
             warnings.filterwarnings('error', category=MySQLdb.Warning)
@@ -78,7 +78,12 @@ class MysqlTwitterConnector:
             self.cursor.executemany(self.insert_tweets_sql, tweets)
             tweet_texts = MysqlTwitterConnector.get_all_elements(tweet_texts_queue)
             self.cursor.executemany(self.insert_tweets_texts_sql, tweet_texts)
-            message_queue.put((1, "Inserted {0} tweets and {1} texts in {2} sec".format(len(tweets), len(tweet_texts), time()-time_start)))
+            message = "Inserted {0} tweets and {1} texts in {2} sec".format(len(tweets), len(tweet_texts), time()-time_start))
+            if logger is None:
+                print message
+            else:
+                logger.info(message)
+
 
             #logger.info("Inserting {0} tweet urls ".format(len(urls)))
             urls = MysqlTwitterConnector.get_all_elements(urls_queue)
@@ -93,17 +98,29 @@ class MysqlTwitterConnector:
             #logger.info("Inserting {0} users ".format(len(list_users)))
             self.cursor.executemany(self.insert_users_sql, users)
 
-            message_queue.put((1, "Commit..."))
+            message = "Commit..."
+            if logger is None:
+                print message
+            else:
+                logger.info(message)
+
             self.conn.commit()
 
             time_elapsed = (time() - time_start)
-            message_queue.put((1, "Queries executed in {0} seconds ".format(time_elapsed)))
+            message = "Queries executed in {0} seconds ".format(time_elapsed)
+            if logger is None:
+                print message
+            else:
+                logger.error(message)
         except Exception:
             error_message = "An error occurred while executing the query:\n"
             if hasattr(self.cursor, '_last_executed'):
                 error_message += self.cursor._last_executed
             trace = traceback.format_exc()
-            message_queue.put((-1, error_message + "\n" + trace))
+            if logger is None:
+                print error_message + "\n" + trace
+            else:
+                logger.error(error_message + "\n" + trace)
             self.conn.rollback()
         finally:
             self.close()

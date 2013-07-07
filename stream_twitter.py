@@ -14,7 +14,7 @@ from twitter import *
 from twitter_helper import util as twitter_util
 from twitter_helper.twitter_data import TwitterData
 from twitter_helper.mysql_connector import MysqlTwitterConnector as DBConnector
-from twitter_helper.status_monitor import ProcessMonitor
+#from twitter_helper.status_monitor import ProcessMonitor
 
 
 """ Setup the logger """
@@ -116,12 +116,12 @@ try:
     continue_download = True
     skip_tweet = False
 
-    """ Setup a messaging queue to track activities """
-    message_queue = Queue.PriorityQueue()
-    monitoring_job = threading.Thread(target=ProcessMonitor.print_messages,
-                                      args=(message_queue, logger))
-    monitoring_job.daemon = True
-    monitoring_job.start()
+    # """ Setup a messaging queue to track activities """
+    # message_queue = Queue.PriorityQueue()
+    # monitoring_job = threading.Thread(target=ProcessMonitor.print_messages,
+    #                                   args=(message_queue, logger))
+    # monitoring_job.daemon = True
+    # monitoring_job.start()
 
     """ Use the stream """
     while continue_download:
@@ -205,12 +205,12 @@ try:
             hashtags = data_parser.hashtags_queue
 
             total_inserted += tweets.qsize()
-
+            logger.info("Starting insertion job")
             db_job = threading.Thread(target=connector.insert_records,
-                                      args=(tweets, tweet_texts, users, urls, hashtags, message_queue))
+                                      args=(tweets, tweet_texts, users, urls, hashtags, logger))
             db_job.start()
 
-            logger.info("downloaded for insertion {0} tweets up to now ".format(total_inserted))
+            logger.info("Downloaded for insertion {0} tweets up to now ".format(total_inserted))
 
             if DM_NOTIFICATIONS and total_inserted % WARN_RATE == 0:
                 logger.info("Tweeting status!")
@@ -258,6 +258,6 @@ except Exception as e:
         twitter.direct_messages.new(user=TWITTER_LISTENER, text=dm_text)
 
 print "-------"
-""" Wait for jobs on the message queue to finish """
-message_queue.join()
+# """ Wait for jobs on the message queue to finish """
+# message_queue.join()
 print total_inserted
