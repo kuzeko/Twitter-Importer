@@ -119,6 +119,7 @@ class TwitterData:
                 if not user_data['lang']:
                     value = 'NN'
                 else:
+                    #TODO: lang codes are longer than 2
                     value = user_data['lang'][:2]
                 user_record.append(value)
             elif field == 'utc_offset':
