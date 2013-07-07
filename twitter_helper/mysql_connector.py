@@ -110,7 +110,7 @@ class MysqlTwitterConnector:
             if logger is None:
                 print message
             else:
-                logger.error(message)
+                logger.info(message)
         except Exception:
             error_message = "An error occurred while executing the query:\n"
             if hasattr(self.cursor, '_last_executed'):
