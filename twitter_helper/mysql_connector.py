@@ -78,12 +78,11 @@ class MysqlTwitterConnector:
             self.cursor.executemany(self.insert_tweets_sql, tweets)
             tweet_texts = MysqlTwitterConnector.get_all_elements(tweet_texts_queue)
             self.cursor.executemany(self.insert_tweets_texts_sql, tweet_texts)
-            message = "Inserted {0} tweets and {1} texts in {2} sec".format(len(tweets), len(tweet_texts), time()-time_start))
+            message = "Inserted {0} tweets and {1} texts in {2} sec".format(len(tweets), len(tweet_texts), time()-time_start)
             if logger is None:
                 print message
             else:
                 logger.info(message)
-
 
             #logger.info("Inserting {0} tweet urls ".format(len(urls)))
             urls = MysqlTwitterConnector.get_all_elements(urls_queue)
