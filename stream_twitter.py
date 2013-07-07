@@ -126,10 +126,10 @@ try:
         """ Computation on the Stream """
         logger.info("Iterating through tweets")
         for tweet in iterator:
-            iteration_count = iteration_count + 1
+            iteration_count +=  + 1
             """ Did we skip last tweet? """
             if skip_tweet:
-                skipped_count = skipped_count + 1
+                skipped_count += 1
                 skip_tweet = False
 
             if iteration_count % WRITE_RATE == 0:
@@ -151,9 +151,9 @@ try:
                 continue
 
             skip_tweet = not data_parser.contains_fields(user_data, TwitterData.user_fields_list)
-
+            skip_tweet = skip_tweet or tweet['text'] is None
             """ if all fields are in place and also the language of the text is acceptable """
-            if not skip_tweet and ("None" in FILTER_LANG or tweet['lang'] in FILTER_LANG) and tweet['text'] is not None:
+            if not skip_tweet and ("None" in FILTER_LANG or tweet['lang'] in FILTER_LANG):
 
                 if DEMO:
                     logger.info("Retrieved: " + tweet['text'])
