@@ -32,11 +32,6 @@ DB_NAME             = config.get('DB_Config', 'db_name')
 DB_USER             = config.get('DB_Config', 'db_user')
 DB_PASS             = config.get('DB_Config', 'db_password')
 CREDS_FILE          = config.get('Twitter_Config', 'twitter_creds')
-TWITTER_USERNAME    = config.get('Twitter_Config', 'username')
-TWITTER_PASSWORD    = config.get('Twitter_Config', 'password')
-
-""" This is temporary, untill we fix OAuth for streams """
-USE_OAUTH           = config.getboolean('Twitter_Config', 'use_oauth')
 CONSUMER_KEY        = config.get('Twitter_Config', 'consumer_key')
 CONSUMER_SECRET     = config.get('Twitter_Config', 'consumer_secret')
 WRITE_RATE          = config.getint('Twitter_Config', 'write_rate')
@@ -65,26 +60,17 @@ else:
 """ Twitter auth Credentials """
 oauth_token, oauth_secret = read_token_file(TWITTER_CREDS)
 oauth_auth_mode = OAuth(oauth_token, oauth_secret, CONSUMER_KEY, CONSUMER_SECRET)
-user_auth_mode = UserPassAuth(TWITTER_USERNAME, TWITTER_PASSWORD)
 
 """ Connection with OAuth: this is used for DM and Tweeting """
 if DM_NOTIFICATIONS:
     logger.info("Connecting to Twitter REST API...")
-    if USE_OAUTH:
-        twitter = Twitter(auth=oauth_auth_mode)
-        logger.info("Authentication mode for REST API: OAuth")
-    else:
-        twitter = Twitter(auth=user_auth_mode)
-        logger.info("Authentication mode for REST API: User/Passsword")
+    twitter = Twitter(auth=oauth_auth_mode)
+    logger.info("Authentication mode for REST API: OAuth")
 
 """ Connection with UserPassword: this is temporarily the only solution for the stream """
 logger.info("Connecting to the stream...")
-if USE_OAUTH:
-    twitter_stream = TwitterStream(auth=oauth_auth_mode)
-    logger.info("Authentication mode for Stream: OAuth")
-else:
-    twitter_stream = TwitterStream(auth=user_auth_mode)
-    logger.info("Authentication mode for Stream: User/Passsword")
+twitter_stream = TwitterStream(auth=oauth_auth_mode)
+logger.info("Authentication mode for Stream: OAuth")
 
 """ Logging Variables """
 iteration_count     = 0
