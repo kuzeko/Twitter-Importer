@@ -72,15 +72,15 @@ class TwitterData:
                     value = html_parser.unescape(value)
                 tweet_text_record.append(value)
             elif field == 'geo_lat':
-                if not tweet['geo']:
+                if not tweet['coordinates']:
                     tweet_text_record.append(0)
                 else:
-                    tweet_text_record.append(tweet['geo']['coordinates'][0])
+                    tweet_text_record.append(tweet['coordinates']['coordinates'][0])
             elif field == 'geo_long':
-                if not tweet['geo']:
+                if not tweet['coordinates']:
                     tweet_text_record.append(0)
                 else:
-                    tweet_text_record.append(tweet['geo']['coordinates'][1])
+                    tweet_text_record.append(tweet['coordinates']['coordinates'][1])
             elif field == 'place_full_name':
                 if not tweet['place']:
                     value = ''
