@@ -160,9 +160,9 @@ try:
                     success = True
                 else:
                     """ put the tweet in the queue to be inserted later """
-                    sucess = data_parser.enqueue_tweet_data(tweet)
+                    success = data_parser.enqueue_tweet_data(tweet)
 
-                if sucess:
+                if success:
                     inserted_count += 1
                     """ If buffer is full stop downloading and start a writing thread """
                     if inserted_count >= WRITE_RATE:
