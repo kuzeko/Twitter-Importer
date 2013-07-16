@@ -7,6 +7,7 @@ import Queue
 import ConfigParser
 import HTMLParser
 import threading
+import urrlib2
 from time import time
 
 from twitter import *
@@ -179,7 +180,7 @@ try:
             skipped_count = 0
             inserted_count = 0
             iteration_count = 0
-        except HTTPError as e:
+        except urrlib2.HTTPError as e:
             logger.error("An error occurred while downloading tweets:")
             trace = traceback.format_exc()
             logger.error(trace)
