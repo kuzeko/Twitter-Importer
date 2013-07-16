@@ -112,72 +112,87 @@ try:
 
     """ Use the stream """
     while continue_download:
-        """ Measure time """
-        time_start = time()
+        try:
+            """ Measure time """
+            time_start = time()
 
-        """ Size of the buffer of tweets to write in the DB """
-        buffer_size = WRITE_RATE
-        """ Prepare parser with some larger buffer size """
-        data_parser = TwitterData(buffer_size + (buffer_size/100))
-        """ Get the tweets - this is also important to be refreshed every now and then """
-        iterator = twitter_stream.statuses.sample()
-        logger.info("Got Stream connection!")
+            """ Size of the buffer of tweets to write in the DB """
+            buffer_size = WRITE_RATE
+            """ Prepare parser with some larger buffer size """
+            data_parser = TwitterData(buffer_size + (buffer_size/100))
+            """ Get the tweets - this is also important to be refreshed every now and then """
+            iterator = twitter_stream.statuses.sample()
+            logger.info("Got Stream connection!")
 
-        """ Computation on the Stream """
-        logger.info("Iterating through tweets")
-        for tweet in iterator:
-            iteration_count +=  + 1
-            """ Did we skip last tweet? """
-            if skip_tweet:
-                skipped_count += 1
-                skip_tweet = False
+            """ Computation on the Stream """
+            logger.info("Iterating through tweets")
+            for tweet in iterator:
+                iteration_count +=  + 1
+                """ Did we skip last tweet? """
+                if skip_tweet:
+                    skipped_count += 1
+                    skip_tweet = False
 
-            if iteration_count % WRITE_RATE == 0:
-                logger.info("Skipped {0} objects, Inserted {1} and Downloaded {2}".format(skipped_count, inserted_count, iteration_count))
+                if iteration_count % WRITE_RATE == 0:
+                    logger.info("Skipped {0} objects, Inserted {1} and Downloaded {2}".format(skipped_count, inserted_count, iteration_count))
 
-            """ Check if the tweet contains all the necessary fields """
-            skip_tweet = not data_parser.contains_fields(tweet, TwitterData.tweet_fields_list,  ['user_id'])
-            skip_tweet = skip_tweet and not data_parser.contains_fields(tweet, ['text'])
+                """ Check if the tweet contains all the necessary fields """
+                skip_tweet = not data_parser.contains_fields(tweet, TwitterData.tweet_fields_list,  ['user_id'])
+                skip_tweet = skip_tweet and not data_parser.contains_fields(tweet, ['text'])
 
-            """ if it doesn't: skip it """
-            if skip_tweet:
-                continue
+                """ if it doesn't: skip it """
+                if skip_tweet:
+                    continue
 
-            user_data = []
-            skip_tweet = not 'user' in tweet
-            if not skip_tweet:
-                user_data = tweet['user']
-            else:
-                continue
-
-            skip_tweet = not data_parser.contains_fields(user_data, TwitterData.user_fields_list)
-            skip_tweet = skip_tweet or tweet['text'] is None
-            """ if all fields are in place and also the language of the text is acceptable """
-            if not skip_tweet and ("None" in FILTER_LANG or tweet['lang'] in FILTER_LANG):
-
-                if DEMO:
-                    logger.info("Retrieved: " + tweet['text'])
-                    success = True
+                user_data = []
+                skip_tweet = not 'user' in tweet
+                if not skip_tweet:
+                    user_data = tweet['user']
                 else:
-                    """ put the tweet in the queue to be inserted later """
-                    success = data_parser.enqueue_tweet_data(tweet)
+                    continue
 
-                if success:
-                    inserted_count += 1
-                    """ If buffer is full stop downloading and start a writing thread """
-                    if inserted_count >= WRITE_RATE:
-                        break
+                skip_tweet = not data_parser.contains_fields(user_data, TwitterData.user_fields_list)
+                skip_tweet = skip_tweet or tweet['text'] is None
+                """ if all fields are in place and also the language of the text is acceptable """
+                if not skip_tweet and ("None" in FILTER_LANG or tweet['lang'] in FILTER_LANG):
 
-        """ Print some stats """
-        time_elapsed = (time() - time_start)
-        """ Convert to millis and divide for each tweet """
-        time_per_tweet = (time_elapsed*1000) / inserted_count
-        time_iteration = (time_elapsed*1000) / iteration_count
-        logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.3f} millis - 1 iteration rate {2:.3f} millis ".format(time_elapsed, time_per_tweet, time_iteration))
-        """ reset the error count """
-        skipped_count = 0
-        inserted_count = 0
-        iteration_count = 0
+                    if DEMO:
+                        logger.info("Retrieved: " + tweet['text'])
+                        success = True
+                    else:
+                        """ put the tweet in the queue to be inserted later """
+                        success = data_parser.enqueue_tweet_data(tweet)
+
+                    if success:
+                        inserted_count += 1
+                        """ If buffer is full stop downloading and start a writing thread """
+                        if inserted_count >= WRITE_RATE:
+                            break
+
+            """ Print some stats """
+            time_elapsed = (time() - time_start)
+            """ Convert to millis and divide for each tweet """
+            time_per_tweet = (time_elapsed*1000) / inserted_count
+            time_iteration = (time_elapsed*1000) / iteration_count
+            logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.3f} millis - 1 iteration rate {2:.3f} millis ".format(time_elapsed, time_per_tweet, time_iteration))
+            """ reset the error count """
+            skipped_count = 0
+            inserted_count = 0
+            iteration_count = 0
+        except HTTPError as e:
+            logger.error("An error occurred while downloading tweets:")
+            trace = traceback.format_exc()
+            logger.error(trace)
+            if DM_NOTIFICATIONS:
+                """ Send a DM to notify of the problem """
+                logger.info("Warn your master!")
+                now = datetime.datetime.now()
+                error_type = "{0}]".format(e.__class__.__name__)
+                error_message = "[ERROR: " + error_type + " "
+                dm_text = now.strftime("%Y-%m-%d %H:%M") + error_message + "Application is trying to continue after {0} tweets!"
+                dm_text = dm_text.format(total_inserted)
+                logger.info("Sending: " + dm_text)
+                twitter.direct_messages.new(user=TWITTER_LISTENER, text=dm_text)
 
         if not DEMO:
             logger.info("Creating connector to the Database")
@@ -227,6 +242,7 @@ try:
             if WARN_RATE != WARN_RATE_TMP:
                 logger.info("WARN RATE changed from {0} to {1} ".format(WARN_RATE, WARN_RATE_TMP))
                 WARN_RATE = WARN_RATE_TMP
+
 
 except Exception as e:
     logger.error("An error occurred while downloading tweets:")
