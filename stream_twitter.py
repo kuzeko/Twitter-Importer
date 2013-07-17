@@ -70,7 +70,7 @@ if DM_NOTIFICATIONS:
 
 """ Connection with UserPassword: this is temporarily the only solution for the stream """
 logger.info("Connecting to the stream...")
-twitter_stream = TwitterStream(auth=oauth_auth_mode)
+twitter_stream = TwitterStream(auth=oauth_auth_mode, block=False)
 logger.info("Authentication mode for Stream: OAuth")
 
 """ Logging Variables """
@@ -128,6 +128,9 @@ try:
             """ Computation on the Stream """
             logger.info("Iterating through tweets")
             for tweet in iterator:
+                if tweet is None:
+                    time.sleep(0.2)
+                    continue
                 iteration_count +=  + 1
                 """ Did we skip last tweet? """
                 if skip_tweet:
