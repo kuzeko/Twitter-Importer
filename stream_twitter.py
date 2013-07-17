@@ -132,6 +132,7 @@ try:
                 if tweet is None:
                     none_tweets += 1
                     if none_tweets > 20:
+                        logger.info("More than 20 Null tweets, sleeping")
                         time.sleep(0.2)
                         none_tweets = 0
                     continue
