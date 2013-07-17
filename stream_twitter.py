@@ -127,10 +127,15 @@ try:
 
             """ Computation on the Stream """
             logger.info("Iterating through tweets")
+            none_tweets = 0
             for tweet in iterator:
                 if tweet is None:
-                    time.sleep(0.2)
+                    none_tweets += 1
+                    if none_tweets > 20:
+                        time.sleep(0.2)
+                        none_tweets = 0
                     continue
+                none_tweets = 0
                 iteration_count +=  + 1
                 """ Did we skip last tweet? """
                 if skip_tweet:
