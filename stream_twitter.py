@@ -129,7 +129,7 @@ try:
             logger.info("Iterating through tweets")
             for tweet in iterator:
                 if tweet is None:
-                    time.sleep(0.2)
+                    sleep(0.2)
                     continue
                 iteration_count +=  + 1
                 """ Did we skip last tweet? """
