@@ -131,10 +131,12 @@ try:
             for tweet in iterator:
                 if tweet is None:
                     none_tweets += 1
-                    if none_tweets > 20:
-                        logger.info("More than 20 Null tweets, sleeping")
-                        time.sleep(0.2)
-                        none_tweets = 0
+                    if none_tweets % 100 == 0:
+                        logger.info("More than 100 Null tweets, sleeping")
+                        time.sleep(5.2)
+                    if none_tweets > 10000:
+                        logger.info("More than 10000 Null tweets, restarting")
+                        break
                     continue
                 none_tweets = 0
                 iteration_count +=  + 1
