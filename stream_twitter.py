@@ -8,7 +8,7 @@ import ConfigParser
 import HTMLParser
 import threading
 import urllib2
-from time import time
+import time
 
 from twitter import *
 
@@ -96,13 +96,13 @@ if DM_NOTIFICATIONS:
 
     dm_text = now.strftime("%Y-%m-%d %H:%M") + " started downloading tweets "
     twitter.direct_messages.new(user=TWITTER_LISTENER, text=dm_text)
-    last_time_notified = time()
+    last_time_notified = time.time()
 
 logger.info("Warn rate is {0} , write rate is {1}".format(WARN_RATE, WRITE_RATE))
 try:
     continue_download = True
     skip_tweet = False
-    application_start_time = time()
+    application_start_time = time.time()
 
     # """ Setup a messaging queue to track activities """
     # message_queue = Queue.PriorityQueue()
@@ -115,7 +115,7 @@ try:
     while continue_download:
         try:
             """ Measure time """
-            time_start = time()
+            time_start = time.time()
 
             """ Size of the buffer of tweets to write in the DB """
             buffer_size = WRITE_RATE
@@ -129,7 +129,7 @@ try:
             logger.info("Iterating through tweets")
             for tweet in iterator:
                 if tweet is None:
-                    sleep(0.2)
+                    time.sleep(0.2)
                     continue
                 iteration_count +=  + 1
                 """ Did we skip last tweet? """
@@ -174,7 +174,7 @@ try:
                             break
 
             """ Print some stats """
-            time_elapsed = (time() - time_start)
+            time_elapsed = (time.time() - time_start)
             """ Convert to millis and divide for each tweet """
             time_per_tweet = (time_elapsed*1000) / inserted_count
             time_iteration = (time_elapsed*1000) / iteration_count
@@ -216,7 +216,7 @@ try:
                                       args=(tweets, tweet_texts, users, urls, hashtags, logger))
             db_job.start()
 
-            logger.info("Downloaded for insertion {0} tweets up to now after {1} secs ".format(total_inserted, (time() - application_start_time)))
+            logger.info("Downloaded for insertion {0} tweets up to now after {1} secs ".format(total_inserted, (time.time() - application_start_time)))
 
             if DM_NOTIFICATIONS and total_inserted % WARN_RATE == 0:
                 logger.info("Tweeting status!")
@@ -231,9 +231,9 @@ try:
                 """ No more fun """
 
                 prv_msg = now.strftime("%Y-%m-%d %H:%M") + " Downloaded {0} tweets after {1:.4f} minutes"
-                minutes = (time()-last_time_notified)/60
+                minutes = (time.time()-last_time_notified)/60
                 twitter.direct_messages.new(user=TWITTER_LISTENER, text=prv_msg.format(total_inserted, minutes))
-                last_time_notified = time()
+                last_time_notified = time.time()
 
             time_elapsed = 0
 
