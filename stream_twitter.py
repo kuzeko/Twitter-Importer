@@ -70,7 +70,7 @@ if DM_NOTIFICATIONS:
 
 """ Connection with UserPassword: this is temporarily the only solution for the stream """
 logger.info("Connecting to the stream...")
-twitter_stream = TwitterStream(auth=oauth_auth_mode, block=False)
+twitter_stream = TwitterStream(auth=oauth_auth_mode, block=True)
 logger.info("Authentication mode for Stream: OAuth")
 
 """ Logging Variables """
@@ -134,8 +134,8 @@ try:
                     if none_tweets % 100 == 0:
                         logger.info("More than 100 Null tweets, sleeping")
                         time.sleep(5.2)
-                    if none_tweets > 10000:
-                        logger.info("More than 10000 Null tweets, restarting")
+                    if none_tweets > 1000:
+                        logger.info("More than 1000 Null tweets, restarting")
                         break
                     continue
                 none_tweets = 0
