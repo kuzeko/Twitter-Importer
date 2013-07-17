@@ -69,7 +69,6 @@ Consumer secret and Consumer keys are required for the OAuth authentication.
 `max_caching_entries` refers to the number of hashtags IDs to keep in memory, it is needed to limit the number of queries to the database when we need to store for each tweet the IDs of the hashtags mentioned in it.     
 When activating the `demo_mode` instead of saving anything to the database, you will just received a print out on screen of the tweets that have been downloaded.
 
-
     [Twitter_Config]
     dir = ./config
     twitter_creds = %(dir)s/my_app_credentials
@@ -84,6 +83,17 @@ When activating the `demo_mode` instead of saving anything to the database, you 
     warn_rate = 100000
     max_caching_entries = 1000
 
+## Issues
+### 401 Unauthorized 
+If you encounter  problems with OAuth and a wild
+
+    HTTP Error 401: Unauthorized
+
+appears, the answer (in 90% of the cases) is: 
+
+    sudo  ntpdate -b pool.ntp.org
+
+Yes, your system has lost a minute too much!
 
 
 ## Python Twitter Tools as Submodule
