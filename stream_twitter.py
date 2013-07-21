@@ -195,6 +195,8 @@ try:
             logger.error("An error occurred while downloading tweets:")
             trace = traceback.format_exc()
             logger.error(trace)
+            """ Wait a bit before trying something else """
+            time.sleep(35.2)
             if DM_NOTIFICATIONS:
                 """ Send a DM to notify of the problem """
                 logger.info("Warn your master!")
@@ -227,21 +229,29 @@ try:
             logger.info("Downloaded for insertion {0} tweets up to now after {1} secs ".format(total_inserted, (time.time() - application_start_time)))
 
             if DM_NOTIFICATIONS and total_inserted % WARN_RATE == 0:
-                logger.info("Tweeting status!")
+                try:
+                    logger.info("Tweeting status!")
 
-                """ This is just for fun """
-                logger.info("Reading Hamlet, for real!")
-                text_file = open("./Hamlet.txt")
-                line = twitter_util.prepare_quote(text_file)
-                now = datetime.datetime.now()
-                logger.info("Posting on twitter")
-                twitter.statuses.update(status=line)
-                """ No more fun """
+                    """ This is just for fun """
+                    logger.info("Reading Hamlet, for real!")
+                    text_file = open("./Hamlet.txt")
+                    line = twitter_util.prepare_quote(text_file)
+                    now = datetime.datetime.now()
+                    logger.info("Posting on twitter")
+                    twitter.statuses.update(status=line)
+                    """ No more fun """
 
-                prv_msg = now.strftime("%Y-%m-%d %H:%M") + " Downloaded {0} tweets after {1:.4f} minutes"
-                minutes = (time.time()-last_time_notified)/60
-                twitter.direct_messages.new(user=TWITTER_LISTENER, text=prv_msg.format(total_inserted, minutes))
-                last_time_notified = time.time()
+                    prv_msg = now.strftime("%Y-%m-%d %H:%M") + " Downloaded {0} tweets after {1:.4f} minutes"
+                    minutes = (time.time()-last_time_notified)/60
+                    twitter.direct_messages.new(user=TWITTER_LISTENER, text=prv_msg.format(total_inserted, minutes))
+                    last_time_notified = time.time()
+                except Exception as e:
+                    logger.error("An error occurred while notifying:")
+                    trace = traceback.format_exc()
+                    logger.error(trace)
+                    """ it is not critical, better wait and try again """
+                    time.sleep(35.2)
+
 
             time_elapsed = 0
 
