@@ -150,7 +150,7 @@ try:
 
                 """ Check if the tweet contains all the necessary fields """
                 skip_tweet = not data_parser.contains_fields(tweet, TwitterData.tweet_fields_list,  ['user_id'])
-                skip_tweet = skip_tweet and not data_parser.contains_fields(tweet, ['text'])
+                skip_tweet = skip_tweet or not data_parser.contains_fields(tweet, ['text'])
 
                 """ if it doesn't: skip it """
                 if skip_tweet:
@@ -166,7 +166,7 @@ try:
                 skip_tweet = not data_parser.contains_fields(user_data, TwitterData.user_fields_list)
                 skip_tweet = skip_tweet or tweet['text'] is None
                 """ if all fields are in place and also the language of the text is acceptable """
-                if not skip_tweet and ("None" in FILTER_LANG or tweet['lang'] in FILTER_LANG):
+                if not skip_tweet and ('lang' in tweet and ("None" in FILTER_LANG or tweet['lang'] in FILTER_LANG)):
 
                     if DEMO:
                         logger.info("Retrieved: " + tweet['text'])
