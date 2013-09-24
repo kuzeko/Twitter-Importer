@@ -70,7 +70,7 @@ if DM_NOTIFICATIONS:
 
 """ Connection with UserPassword: this is temporarily the only solution for the stream """
 logger.info("Connecting to the stream...")
-twitter_stream = TwitterStream(auth=oauth_auth_mode, block=True)
+twitter_stream = TwitterStream(auth=oauth_auth_mode, block=False)
 logger.info("Authentication mode for Stream: OAuth")
 
 """ Logging Variables """
