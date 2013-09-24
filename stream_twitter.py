@@ -228,7 +228,7 @@ try:
 
             logger.info("Downloaded for insertion {0} tweets up to now after {1} secs ".format(total_inserted, (time.time() - application_start_time)))
 
-            if DM_NOTIFICATIONS and total_inserted % WARN_RATE == 0:
+            if DM_NOTIFICATIONS and (time.time() - last_time_notified)/(60*60) >  18  == 0:
                 try:
                     logger.info("Tweeting status!")
 
