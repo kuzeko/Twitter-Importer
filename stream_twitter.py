@@ -187,6 +187,24 @@ try:
             time_per_tweet = (time_elapsed*1000) / inserted_count
             time_iteration = (time_elapsed*1000) / iteration_count
             logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.3f} millis - 1 iteration rate {2:.3f} millis ".format(time_elapsed, time_per_tweet, time_iteration))
+
+            """ Notify when it may be stuck """
+            if DM_NOTIFICATIONS and skipped_count > 1000 and (time.time() - last_time_notified)/(60*60) > 18:
+                try:
+                    logger.info("Tweeting status!")
+                    prv_msg = now.strftime("%Y-%m-%d %H:%M") + " System may be stuck: Downloaded {0} and skipped {1} tweets after {2:.4f} minutes"
+                    minutes = (time.time()-last_time_notified)/60
+                    logger.info(prv_msg.format(total_inserted, skipped_count, minutes))
+                    twitter.direct_messages.new(user=TWITTER_LISTENER, text=prv_msg.format(total_inserted, skipped_count, minutes))
+                    last_time_notified = time.time()
+                except Exception as e:
+                    logger.error("An error occurred while notifying:")
+                    trace = traceback.format_exc()
+                    logger.error(trace)
+                    """ it is not critical, better wait and try again """
+                    time.sleep(15)
+
+
             """ reset the error count """
             skipped_count = 0
             inserted_count = 0
