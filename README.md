@@ -3,7 +3,7 @@ This is an ongoing project to build a downloader for Tweets into a relational Da
 
 It makes use of the pretty good implementation of [sixohsix's Python Twitter Tools](https://github.com/sixohsix/twitter)
 
-It is designed to download tweets from [the streaming API](https://dev.twitter.com/docs/streaming-apis), save english tweets in a MySQL database, and to notify you now and then about the status of the download. 
+It is designed to download tweets from [the streaming API](https://dev.twitter.com/docs/streaming-apis), save english tweets in a MySQL database, and to notify you now and then about the status of the download.
 
 
 ## Set Up
@@ -48,25 +48,25 @@ Username and Password authentication mode has been deprecated and removed
 The configuration file is organized as follows:
 
 The first section contans the authentication parameters to the database, where tweets and data relative to them are stored.
- 
+
     [DB_Config]
     db_host = localhost
     db_name = twitter
     db_user = username
     db_password = th3p4$$w0rd
-    
+
 
 The second section instead contains the path to the configuration directory, relative to the root of the project.
 The name of the file where the OAuth credentials are stored.
 The username of the twitter account under which the application is running.
 The Twitter username to which the application will send a Direct Message once the number of tweets declared into `warn_rate` have been downloaded.
-You want this to notify you that the application is still running and to stay updated about its actual performances. 
+You want this to notify you that the application is still running and to stay updated about its actual performances.
 There is flag for that: `direct_message_notification`.
 The `language` field filters tweets by their language code - use `xx` as value to download every tweet.
 
 Consumer secret and Consumer keys are required for the OAuth authentication.
 `write_rate` specifies the number of tweets to download before writing them to the database.
-`max_caching_entries` refers to the number of hashtags IDs to keep in memory, it is needed to limit the number of queries to the database when we need to store for each tweet the IDs of the hashtags mentioned in it.     
+`max_caching_entries` refers to the number of hashtags IDs to keep in memory, it is needed to limit the number of queries to the database when we need to store for each tweet the IDs of the hashtags mentioned in it.
 When activating the `demo_mode` instead of saving anything to the database, you will just received a print out on screen of the tweets that have been downloaded.
 
     [Twitter_Config]
@@ -84,12 +84,12 @@ When activating the `demo_mode` instead of saving anything to the database, you 
     max_caching_entries = 1000
 
 ## Issues
-### 401 Unauthorized 
+### 401 Unauthorized
 If you encounter  problems with OAuth and a wild
 
     HTTP Error 401: Unauthorized
 
-appears, the answer (in 90% of the cases) is: 
+appears, the answer (in 90% of the cases) is:
 
     sudo  ntpdate -b pool.ntp.org
 
@@ -99,10 +99,9 @@ Yes, your system has lost a minute too much!
 ## Python Twitter Tools as Submodule
 [Sixohsix's Python Twitter Tools](https://github.com/sixohsix/twitter) is included as a submodule.
 You can read more about [Submodules Git Tool](http://git-scm.com/book/en/Git-Tools-Submodules), basically when you receive the project, you get the directory that contains the submodule, but none of the files yet.
+You can even install the library independently - this submodule could be removed in the future.
+For now you first init the submodule from the root directory of the project and update it as follows
 
-So you should enter the directory, and then init the submodule and update it as follows
-
-    cd lib/twitter-python
     git submodule init
     git submodule update
 
@@ -112,5 +111,13 @@ Then the module need to be installed
     sudo python setup.py install
 
 
+## Other dependencies
+To install other dependencies
+
+    `sudo apt-get install python-mysqldb` to install MySQL-python
+
+
 # Licence
 This software as the Python Twitter Tools are released under an MIT License.
+
+
