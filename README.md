@@ -115,7 +115,7 @@ Then the module need to be installed
 To install other dependencies
 
     `sudo apt-get install python-mysqldb` to install MySQL-python
-
+    `sudo apt-get install python-dateutil` to install Dateutil
 
 # Licence
 This software as the Python Twitter Tools are released under an MIT License.
