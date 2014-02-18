@@ -6,12 +6,12 @@ import datetime
 import ConfigParser
 import MySQLdb
 import pprint
-"""  check libraries """"
+"""  check libraries """
 
 from twitter import *
 from twitter_helper import util as twitter_util
 
-""" This code is intentionally importing any library used by the library """"
+""" This code is intentionally importing any library used by the library """
 
 config = ConfigParser.ConfigParser()
 file = config.read('config/twitter_config.cfg')
