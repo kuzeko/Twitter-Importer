@@ -1,4 +1,3 @@
-import gc
 import os
 import sys
 import logging
@@ -6,8 +5,13 @@ import random
 import datetime
 import ConfigParser
 import MySQLdb
+import pprint
+"""  check libraries """"
 
 from twitter import *
+from twitter_helper import util as twitter_util
+
+""" This code is intentionally importing any library used by the library """"
 
 config = ConfigParser.ConfigParser()
 file = config.read('config/twitter_config.cfg')
@@ -21,12 +25,36 @@ TWITTER_CREDS       = os.path.expanduser(CREDS_FILE)
 oauth_token, oauth_secret = read_token_file(TWITTER_CREDS)
 oauth = OAuth( oauth_token, oauth_secret,CONSUMER_KEY,  CONSUMER_SECRET)
 
+#Connecting to Twitter
+print "Connecting to the stream..."
 
-twitter = Twitter(auth=oauth)
-#773907288
-user_id = 'mfahmy123'
+#twitter = TwitterStream(domain='stream.twitter.com', auth=UserPassAuth('EsampleUsername', 'EsamplePWDxxx')) <-- no more active
+twitter = TwitterStream(domain='stream.twitter.com', auth=oauth, block=True)
 
-u = twitter.users.lookup(screen_name=user_id)
+print "Opening the stream..."
 
-print "-------"
-print u
+#ver = twitter.account.verify()
+#print ver
+iterator = twitter.statuses.filter(track="love")
+# Different test
+#iterator = twitter.user()
+
+print "Reading the stream..."
+
+#iterator = twitter.statuses.home_timeline()
+
+now = datetime.datetime.now()
+print now.strftime("%Y-%m-%d %H:%M")
+
+count = 0
+for tweet in iterator :
+        print tweet
+        if tweet is not None and 'text' in tweet:
+                print tweet['text']
+                print tweet['id']
+
+        count = count + 1
+        if count > 50 :
+                break
+print "Downloaded {0}".format(count)
+print "Done!"
