@@ -68,7 +68,7 @@ if DM_NOTIFICATIONS:
     twitter = Twitter(auth=oauth_auth_mode)
     logger.info("Authentication mode for REST API: OAuth")
 
-""" Connection with UserPassword: this is temporarily the only solution for the stream """
+""" Connection with OAuth: this is currently the only way """
 logger.info("Connecting to the stream...")
 twitter_stream = TwitterStream(auth=oauth_auth_mode, block=False)
 logger.info("Authentication mode for Stream: OAuth")
