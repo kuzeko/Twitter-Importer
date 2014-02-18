@@ -3,6 +3,7 @@ import sys
 import logging
 import random
 import datetime
+import dateutil
 import ConfigParser
 import MySQLdb
 import pprint
@@ -48,7 +49,7 @@ print now.strftime("%Y-%m-%d %H:%M")
 
 count = 0
 for tweet in iterator :
-        print tweet
+        # print tweet
         if tweet is not None and 'text' in tweet:
                 print tweet['text']
                 print tweet['id']
