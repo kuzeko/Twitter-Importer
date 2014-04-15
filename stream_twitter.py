@@ -9,6 +9,7 @@ import HTMLParser
 import threading
 import urllib2
 import time
+import gc
 
 from twitter import *
 
@@ -114,6 +115,10 @@ try:
     """ Use the stream """
     while continue_download:
         try:
+            """ Reset """
+            iterator = None
+            gc.collect()
+
             """ Measure time """
             time_start = time.time()
 
@@ -122,7 +127,7 @@ try:
             """ Prepare parser with some larger buffer size """
             data_parser = TwitterData(buffer_size + (buffer_size/100))
             """ Get the tweets - this is also important to be refreshed every now and then """
-            with twitter_stream.statuses.sample() as iterator:
+            iterator = twitter_stream.statuses.sample()
                 logger.info("Got Stream connection!")
 
                 """ Computation on the Stream """
@@ -191,7 +196,7 @@ try:
             logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.3f} millis - 1 iteration rate {2:.3f} millis ".format(time_elapsed, time_per_tweet, time_iteration))
 
             """ Notify when it may be stuck """
-            if DM_NOTIFICATIONS and skipped_count > 1000 and (time.time() - last_time_notified)/(60*60) > 18:
+            if DM_NOTIFICATIONS and skipped_count > 50000 and (time.time() - last_time_notified)/(60*60) > 18:
                 try:
                     logger.info("Tweeting status!")
                     prv_msg = now.strftime("%Y-%m-%d %H:%M") + " System may be stuck: Downloaded {0} and skipped {1} tweets after {2:.4f} minutes"
