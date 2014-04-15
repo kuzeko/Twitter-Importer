@@ -122,64 +122,66 @@ try:
             """ Prepare parser with some larger buffer size """
             data_parser = TwitterData(buffer_size + (buffer_size/100))
             """ Get the tweets - this is also important to be refreshed every now and then """
-            iterator = twitter_stream.statuses.sample()
-            logger.info("Got Stream connection!")
+            with twitter_stream.statuses.sample() as iterator:
+                logger.info("Got Stream connection!")
 
-            """ Computation on the Stream """
-            logger.info("Iterating through tweets")
-            none_tweets = 0
-            for tweet in iterator:
-                if tweet is None:
-                    none_tweets += 1
-                    if none_tweets % 100 == 0:
-                        logger.info("More than 100 Null tweets, sleeping")
-                        time.sleep(5.2)
-                    if none_tweets > 1000:
-                        logger.info("More than 1000 Null tweets, restarting")
-                        break
-                    continue
+                """ Computation on the Stream """
+                logger.info("Iterating through tweets")
                 none_tweets = 0
-                iteration_count +=  + 1
-                """ Did we skip last tweet? """
-                if skip_tweet:
-                    skipped_count += 1
-                    skip_tweet = False
-
-                if iteration_count % WRITE_RATE == 0:
-                    logger.info("Skipped {0} objects, Inserted {1} and Downloaded {2}".format(skipped_count, inserted_count, iteration_count))
-
-                """ Check if the tweet contains all the necessary fields """
-                skip_tweet = not data_parser.contains_fields(tweet, TwitterData.tweet_fields_list,  ['user_id'])
-                skip_tweet = skip_tweet or not data_parser.contains_fields(tweet, ['text'])
-
-                """ if it doesn't: skip it """
-                if skip_tweet:
-                    continue
-
-                user_data = []
-                skip_tweet = not 'user' in tweet
-                if not skip_tweet:
-                    user_data = tweet['user']
-                else:
-                    continue
-
-                skip_tweet = not data_parser.contains_fields(user_data, TwitterData.user_fields_list)
-                skip_tweet = skip_tweet or tweet['text'] is None
-                """ if all fields are in place and also the language of the text is acceptable """
-                if not skip_tweet and ('lang' in tweet and ("None" in FILTER_LANG or tweet['lang'] in FILTER_LANG)):
-
-                    if DEMO:
-                        logger.info("Retrieved: " + tweet['text'])
-                        success = True
-                    else:
-                        """ put the tweet in the queue to be inserted later """
-                        success = data_parser.enqueue_tweet_data(tweet)
-
-                    if success:
-                        inserted_count += 1
-                        """ If buffer is full stop downloading and start a writing thread """
-                        if inserted_count >= WRITE_RATE:
+                for tweet in iterator:
+                    if tweet is None:
+                        none_tweets += 1
+                        if none_tweets > 50000:
+                            logger.info("More than 50000 Null tweets, restarting")
                             break
+                        if none_tweets % 1000 == 0:
+                            logger.info("More than 1000 Null tweets, sleeping")
+                            time.sleep(5.2)
+                        if none_tweets % 100 == 0:
+                            time.sleep(3.2)
+                        continue
+                    none_tweets = 0
+                    iteration_count +=  + 1
+                    """ Did we skip last tweet? """
+                    if skip_tweet:
+                        skipped_count += 1
+                        skip_tweet = False
+
+                    if iteration_count % WRITE_RATE == 0:
+                        logger.info("Skipped {0} objects, Inserted {1} and Downloaded {2}".format(skipped_count, inserted_count, iteration_count))
+
+                    """ Check if the tweet contains all the necessary fields """
+                    skip_tweet = not data_parser.contains_fields(tweet, TwitterData.tweet_fields_list,  ['user_id'])
+                    skip_tweet = skip_tweet or not data_parser.contains_fields(tweet, ['text'])
+
+                    """ if it doesn't: skip it """
+                    if skip_tweet:
+                        continue
+
+                    user_data = []
+                    skip_tweet = not 'user' in tweet
+                    if not skip_tweet:
+                        user_data = tweet['user']
+                    else:
+                        continue
+
+                    skip_tweet = not data_parser.contains_fields(user_data, TwitterData.user_fields_list)
+                    skip_tweet = skip_tweet or tweet['text'] is None
+                    """ if all fields are in place and also the language of the text is acceptable """
+                    if not skip_tweet and ('lang' in tweet and ("None" in FILTER_LANG or tweet['lang'] in FILTER_LANG)):
+
+                        if DEMO:
+                            logger.info("Retrieved: " + tweet['text'])
+                            success = True
+                        else:
+                            """ put the tweet in the queue to be inserted later """
+                            success = data_parser.enqueue_tweet_data(tweet)
+
+                        if success:
+                            inserted_count += 1
+                            """ If buffer is full stop downloading and start a writing thread """
+                            if inserted_count >= WRITE_RATE:
+                                break
 
             """ Print some stats """
             time_elapsed = (time.time() - time_start)
