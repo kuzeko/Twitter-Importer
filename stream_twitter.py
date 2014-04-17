@@ -124,8 +124,8 @@ try:
             """ Prepare parser with some larger buffer size """
             data_parser = TwitterData(buffer_size + (buffer_size/100))
 
-            if connection_counter == 0":
-            """ Reset """
+            if connection_counter == 0:
+                """ Reset """
                 iterator = None
                 gc.collect()
 
