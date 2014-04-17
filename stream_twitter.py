@@ -80,6 +80,7 @@ inserted_count      = 0
 skipped_count       = 0
 total_inserted      = 0
 last_time_notified  = 0
+connection_counter  = 0
 
 """ Notify via DM the starting of the activities """
 if DM_NOTIFICATIONS:
@@ -115,10 +116,6 @@ try:
     """ Use the stream """
     while continue_download:
         try:
-            """ Reset """
-            iterator = None
-            gc.collect()
-
             """ Measure time """
             time_start = time.time()
 
@@ -126,9 +123,19 @@ try:
             buffer_size = WRITE_RATE
             """ Prepare parser with some larger buffer size """
             data_parser = TwitterData(buffer_size + (buffer_size/100))
-            """ Get the tweets - this is also important to be refreshed every now and then """
-            iterator = twitter_stream.statuses.sample()
-            logger.info("Got Stream connection!")
+
+            if connection_counter == 0":
+            """ Reset """
+                iterator = None
+                gc.collect()
+
+
+                """ Get the tweets - this is also important to be refreshed every now and then """
+                iterator = twitter_stream.statuses.sample()
+                logger.info("Got Stream connection!")
+
+            connection_counter = (connection_counter + 1) % 5
+
 
             """ Computation on the Stream """
             logger.info("Iterating through tweets")
@@ -191,8 +198,8 @@ try:
             """ Print some stats """
             time_elapsed = (time.time() - time_start)
             """ Convert to millis and divide for each tweet """
-            time_per_tweet = (time_elapsed*1000) / inserted_count
-            time_iteration = (time_elapsed*1000) / iteration_count
+            time_per_tweet = (time_elapsed*1000) / (1 + inserted_count)
+            time_iteration = (time_elapsed*1000) / (1 + iteration_count)
             logger.info("Downloading time {0:.5f} secs - 1 tweet rate {1:.3f} millis - 1 iteration rate {2:.3f} millis ".format(time_elapsed, time_per_tweet, time_iteration))
 
             """ Notify when it may be stuck """
