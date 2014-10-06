@@ -16,6 +16,21 @@ To have this running, you should :
 
 Some notes about step *1* and *3* are below.
 
+## MySQL
+Inside the directory `db` there are some files that will help you set up your local MySQL databse where tweets will be stored.
+You may want to create the user and the databse as in 
+
+    CREATE USER 'twitter'@'localhost' IDENTIFIED BY 'twitter_Pwd';
+    CREATE DATABASE twitter CHARACTER SET utf8 COLLATE utf8_bin;
+    GRANT ALL ON twitter.* TO 'twitter'@'localhost';
+    FLUSH PRIVILEGES;
+  
+and then run from the shell something like `mysql twitter -u twitter -p < db/twitter_schema.sql`
+
+
+
+
+
 
 ## Authentication
 Visit the Twitter developer page and create a new application: https://dev.twitter.com/apps/
