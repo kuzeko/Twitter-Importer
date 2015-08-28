@@ -223,7 +223,7 @@ try:
             skipped_count = 0
             inserted_count = 0
             iteration_count = 0
-        except (urllib2.HTTPError, urllib2.URLError) as e:
+        except (urllib2.HTTPError, urllib2.URLError, ValueError) as e:
             logger.error("An error occurred while downloading tweets:")
             trace = traceback.format_exc()
             logger.error(trace)
