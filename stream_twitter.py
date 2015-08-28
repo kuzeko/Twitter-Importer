@@ -71,7 +71,7 @@ if DM_NOTIFICATIONS:
 
 """ Connection with OAuth: this is currently the only way """
 logger.info("Connecting to the stream...")
-twitter_stream = TwitterStream(auth=oauth_auth_mode, block=False, retry=True)
+twitter_stream = TwitterStream(auth=oauth_auth_mode, block=False)
 logger.info("Authentication mode for Stream: OAuth")
 
 """ Logging Variables """
