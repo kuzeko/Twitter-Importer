@@ -51,11 +51,22 @@ count = 0
 for tweet in iterator :
         # print tweet
         if tweet is not None and 'text' in tweet:
-                print tweet['text']
+                print tweet['id_str']
                 print tweet['id']
+                print tweet['is_quote_status']
+                print "\n twt:"
+                for key, value in tweet.iteritems() :
+                       print key
+                
+                count = count + 1
+                if count > 1 :
+                    break
 
-        count = count + 1
-        if count > 50 :
-                break
+        elif tweet is not None :
+                print "\n SPECIAL:"
+                for key in tweet.iteritems() :
+                       print key
+
+
 print "Downloaded {0}".format(count)
 print "Done!"
